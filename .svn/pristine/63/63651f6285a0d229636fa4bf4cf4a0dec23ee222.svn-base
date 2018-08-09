@@ -1,0 +1,65 @@
+
+<div class="menu_con agin-menu" id="payArea">
+							<!--再次修改-->
+							<div class="bounce-conthr agin-modify">
+								<p>
+									<input checked="num required" type="text" placeholder="请输入国标码" class="lading" id="payval"/>
+									<input type="button" value="确认" class="confirm" />
+									<input type="button" value="清空商品" class="emptygoods" />
+									<input type="button" id="payshowOverlay" value="打开快捷菜单" class="open quick" />
+
+								</p>
+							</div>
+							<div class="big-form modify-form">
+								<div class="form-open modify-form-open modes-open form-open-pay pay_open">
+									<!--表格开始-->
+									<table cellspacing="0" cellpadding="0" class="matter_info">
+										<tbody>
+											<tr class="matter_info_header">
+												<th>国标码</th>
+												<th class="name">名称</th>
+												<th>单价</th>
+												<th class="num">数量</th>
+												<th>折扣</th>
+												<th>金额</th>
+												<th>优惠金额</th>
+												<th>实付金额</th>
+												<th>操作</th>
+											</tr>
+											<!--<tr class="matter_info_cont">
+												<td>01010041</td>
+												<td class="name">番茄蛋包饭饭团</td>
+												<td class="univalent">3.90</td>
+												<td class="num">
+													<span class="less_btn">-</span>
+													<input type="text" name="discount" value="1" class="input-small count_td count_td" maxlength="4">
+													<span class="add_btn">+</span>
+												</td>
+												<td></td>
+												<td class="loan">22.80</td>
+												<td>22.80</td>
+												<td class="actual_num">22.80</td>
+												<td>删除</td>
+											</tr>-->
+										</tbody>
+									</table>
+								</div>
+							</div>
+							<div class="clearfix"></div>
+							<div class="original-con">
+								<div class="original-con-left fleft">
+										<p class="odd-numbers odd-numbers-number">数量合计： <em>6</em></p>
+										<p class="odd-numbers odd-numbersall">金额合计: <em class="money_num">0.00</em></p>
+										<p>优惠券抵用金额: <em class="money_cpu">0.00</em></p>
+										<p class="odd-numbers odd-numbersall">实付金额: <em class="money_countey">0.00</em></p>
+								</div>
+							</div>
+
+							<div class="payment">
+								<input type="button" value="付款" class="payment-order" />
+								<input type="button" value="使用优惠券" class="print">
+								<input type="button" data-orderid="288" value="绑定会员" class="orders">
+								<span class="prompt" style="display:none">会员:<em id="memberId"></em></span>
+							</div>
+							<!--再次修改结束-->
+					</div>

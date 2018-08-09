@@ -1,0 +1,14 @@
+{
+	"code": "000000",
+	"message": "业务处理成功！",
+	"result": {
+		"interCode":"213243252342",
+		"productId": "TC1002",
+		"productName": "黄焖鸡米饭+可乐",
+		"proType": "",
+		"orgPrice": 0,
+		"price": 0,
+		"supplierId": 1,
+		"isShop": "0"
+	}
+}

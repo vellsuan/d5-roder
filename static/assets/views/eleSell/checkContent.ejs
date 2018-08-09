@@ -1,0 +1,17 @@
+<div class="refuse_box_main">
+	<p class="fleft refuse_reason">初审申请:</p>
+	<div class="throug checkAction"><span class="check_choose choose_check"></span><span>通过</span></div>
+	<div class="cant_throug checkAction"><span class="check_choose"></span><span>不通过</span></div>
+	
+	<div class="refuse_box_choose hide">
+		<p class="fleft refuse_reason">拒绝原因:</p>
+		<select class="fleft re_select">
+	
+			<%for(var i = 0; i<list.length; i++){%>
+			<option value="<%=list[i].reason%>">
+				<%=list[i].reason%>
+			</option>
+			<%}%>
+		</select>
+	</div>
+</div>

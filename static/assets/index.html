@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>接单系统</title>
+		<link rel="stylesheet" href="styles/com.css" />
+		<link rel="stylesheet" href="styles/cashier.css" />
+		<link rel="stylesheet" href="styles/pagination.css" />
+		<link rel="stylesheet" href="styles/showLoading.css" />
+		<link rel="stylesheet" href="styles/jquery-ui.css" />
+		<link rel="stylesheet" href="styles/jquery.selectlist.css" />
+		<script src="iscroll.js"></script>
+	</head>
+	<body id="loading" style="overflow: hidden;" onselectstart="return false">
+		<div class="wrapper">
+			<div id="TabMain">
+				<div class="tabBodyContainer">
+					<div class="tabBodyItem tabBodyCurrent">
+						<!--内容-->
+						<div id="moudleContent" style="height: 100%;"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--总盒子结束-->
+		
+		<!--弹出层-->
+		<div class="mask" id="show">
+			<div class="near-show" id="near-show" style="z-index: 200;">
+				<div class="mask-head">
+					<p class="mask-head-span"><span></span><em>点此，可拖拽</em></p>
+					<p class="wrong" id="showHidden"><img src="images/shab.png" alt="" /></p>
+				</div>
+
+				<div class="mask-cont">
+					<div class="distribution-body">
+						<ul class="total" id="totalClass">
+							
+						</ul>
+					</div>
+					<div id="childContent" style="clear: both;"></div>
+				</div>
+			</div>
+		</div>
+		<!--弹出层结束-->
+		
+		<!--弹窗放置EJS模板-->
+		<div id="showContentDialog" class="clearfix positionA tipboxMask" style="display: none">
+			<div class="orderTipbox positionA">
+				<div class="headline">操作确认</div>
+				<div class="tipboxCon clearfix contentArea">
+				</div>
+				<div class="tipboxBtn">
+					<input type="button" value="确认" class="sure fleft"/>
+					<input type="button" value="取消" class="cancel fright"/>
+				</div>
+			</div>
+		</div>
+		<!--拒单弹窗-->
+		<div id="resuseDia" class="clearfix positionA tipboxMask" style="display: none">
+			<div class="orderTipbox positionA">
+				<div class="headline">操作提示</div>
+				<div class="tipboxCon clearfix">
+					<div class="refuse_reasonbox clearfix">
+							<span class="font16pt">拒单原因:</span>
+							<select id="refuseReason" class="re_select">
+							</select>
+					</div>
+				</div>
+				<div class="tipboxBtn">
+					<input type="button" id="judanBtn" value="确认" class="sure fleft"/>
+					<input type="button" value="取消" class="cancel fright"/>
+				</div>
+			</div>
+		</div>
+		<!--公共的确认弹窗  冀-->	
+		<div id="comConfirm" class="clearfix positionA tipboxMask" style="display: none">
+			<div  class="orderTipbox positionA">
+				<div class="headline">操作提示</div>
+				<div class="tipboxCon clearfix">
+					<span class="font16pt">确认执行此操作吗？</span>
+				</div>
+				<div class="tipboxBtn">
+					<input type="button" value="确认" class="sure fleft ok"/>
+					<input type="button" value="取消" class="cancel fright"/>
+				</div>
+			</div>
+		</div>
+		
+		<!--公共的弹窗 成功或者失败提示客户-->		
+		<div id="commonDialog" class="clearfix positionA tipboxMask" style="display: none">
+			<div  class="orderTipbox positionA">
+				<div class="headline">温馨提示</div>
+				<div class="tipboxCon clearfix merchandise">
+					<div class="msg font16pt"></div>
+				</div>
+				<div class="tipboxBtn hide">
+					<input type="button" value="确认" class="sure"/>
+				</div>
+			</div>
+		</div>
+		<!--制度弹出层结束-->
+		
+		<script src="app.js"></script>
+	</body>
+
+</html>

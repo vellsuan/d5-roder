@@ -1,0 +1,28 @@
+<table>
+	<thead>
+		<tr>
+			<th width="60">扫码</th>
+			<th width="40%">数量</th>
+		</tr>
+	</thead>
+	<tbody>
+		<% for(var i=0;i<plist.length;i++){%>
+		<tr class="scanTr">
+			<td>待扫码</td>
+			<td class="num">			
+				<div class="product_calculate">
+						<div class="product_del proshow hide"><span style="cursor: pointer;"></span></div>
+						<div class="product_num" style="border:none">
+							<span data-productNum='<%=plist[i].num%>' class='scanNumSpan'>
+								<% if(orderObj.platform=="0" || orderObj.platform=="6" || orderObj.platform=="7"){%>
+									<%=plist[i].num%>
+								<%}%>
+							</span>
+						</div>
+						<div class="product_add proshow hide"><span style="cursor: pointer;"></span></div>
+				</div>
+			</td>
+		</tr>
+		<%}%>
+	</tbody>
+</table>

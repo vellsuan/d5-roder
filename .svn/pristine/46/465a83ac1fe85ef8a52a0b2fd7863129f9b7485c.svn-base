@@ -1,0 +1,85 @@
+	
+		<!--代码部分begin-->
+		<div id="menu" class="wrap" style="min-height:460px">
+			<!--<div class="positionA backHome">
+				<a href="javascript:void(0);" class="">asfddasf</a>
+			</div>-->
+			<!--tag标题-->
+			<ul id="nav" class="clearfix">
+				<li>
+					<a href="javascript:void(0);" class="selected">待接单</a>
+				</li>
+				<li>
+					<a href="javascript:void(0);" class="">到店自提</a>
+				</li>
+				<li>
+					<a href="javascript:void(0);" class="">已自提订单</a>
+				</li>
+				<li>
+					<a href="javascript:void(0);" class="">已接单</a>
+				</li>
+				<li>
+					<a href="javascript:void(0);" class="">达达拒单列表</a>
+				</li>
+				<li>
+					<a href="javascript:void(0);" class="">历史订单查询</a>
+				</li>
+				<!--<li class="backHome" style="float: right;border: 0;margin-top: -5px;border-radius: 4px;">
+					<a href="javascript:void(0);" onclick="history.back()" class="">返回首页</a>
+				</li>-->
+			</ul>
+			<div class="clearfix"></div>
+			<!--二级菜单-->
+			<ul class="headerUl clearfix">
+				<li class="fleft tleft"><span>单号</span></li>
+				<li class="fleft tleft"><span>下单时间</span></li>
+				<li class="fleft tright"><span>操作</span></li>
+			</ul>
+			<div id="wrapper">
+				<div id="scroller">
+			
+						<div id="eleSellArea" >
+							<div id="menu_con" class="cinall">
+								<div id="xrWait" class="tag" style="display:block">
+									<div class="waitRec"></div>
+								</div>
+								<div class="tag" id="goStoreExtractArea" style="display:none">
+										<div class="bounce-conthr conagin">
+											<p>
+												<input title="提货码" check="required num" type="text" placeholder="请输入提货码" class="lading lad" />
+												<input type="button" value="确认" class="confirm" />
+												<span class="prompt">请输入或扫描添加商品</span>
+											</p>
+										</div>
+										<div class="goStoreExtract"></div>
+								</div>
+								<div class="tag" style="display:none">
+									<div class="selfTakeOver"></div>
+								</div>
+								<div class="tag" style="display:none">
+									<div class="existOrder"></div>
+								</div>
+								<div class="tag" style="display:none">
+									<div class="dadaRefuse"></div>
+								</div>
+								<div class="tag" style="display:none">
+									<div class="historyList"></div>
+								</div>
+							</div>
+						</div>
+		
+				</div>
+		</div>
+		<div class="clearfix positionA footerPage" >
+			<div class="fleft">
+				<input class="refresh" type="button" value="刷新" />
+				<input id="xrOrderQuery" class="actionBtn" type="button" value="订单查询"/>
+			</div>
+			<div class="jiedanPage">
+				<div class="pageTip" style="display:inline-block;"></div>
+				<div id="Pagination_all" class="pagination" style="display:inline-block;"></div>
+			</div>
+		</div>
+			
+	</div>
+		<!--内容结束-->

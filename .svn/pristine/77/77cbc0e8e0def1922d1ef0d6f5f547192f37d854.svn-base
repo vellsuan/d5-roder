@@ -1,0 +1,292 @@
+<template>
+    <el-dialog title="奉送" @open="open" :visible.sync="outerVisible" :show-close="false" :close-on-click-modal="false" class="ourOffer">
+    <div class="outTitle ">
+      <div v-for="(index,reasonItems) in reaList" :key="reasonItems"  @click="reasonClick(index)" v-bind:class="{active:index==qwerqwre}">{{reaList[reasonItems].resaon}}</div>
+
+    </div>
+    <div class="outList">
+      <div @click="childReaClick(index,childReason.reasonList[chuldReaItems].id,childReason.reasonList[chuldReaItems].resaon)" v-bind:class="{active:index==qwerqwer}" v-for="(index,chuldReaItems) in childReason.reasonList" :key="chuldReaItems" >{{childReason.reasonList[chuldReaItems].resaon}}</div>
+    </div>
+    <el-dialog title="提示" top="21.5vh":visible.sync="innerVisible" :show-close="false" class="innerDialog" append-to-body :close-on-click-modal="false">
+      <span>是否对"{{checedList.productName}}"赠送？</span>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="innerClick" class="active" plain>确定</el-button>
+        <el-button @click="innerVisible = false ;outerVisible= true">取 消</el-button>
+      </div>
+    </el-dialog>
+    <div slot="footer" class="dialog-footer">
+      <el-button @click="outClick" class="active" plain>确定</el-button>
+      <el-button @click="quxiao" >取消</el-button>
+    </div>
+  </el-dialog>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      outerVisible:false,
+      innerVisible: false,
+      reaList:{},
+      childReason:{},
+      childReaId:"",
+      qwerqwre:"0",
+      qwerqwer:"0",
+      reason:""
+    };
+  },
+  props:["checedList"],
+  mounted (){
+
+
+
+  },
+  methods: {
+    open(){
+
+      console.log('OR910007')
+      this.reason=''//初始化菜品置空
+      this.qwerqwer='0'//选中的清空
+      this.orderId = this.$store.state.userInfo.shop.orderId;
+      const params = {
+        url: "OR910007",
+        data: {
+          branch: "1001",
+          type: "1",
+        }
+      };
+      this.api.post(params, res => {
+        this. reaList = res.list
+        console.log(this. reaList)
+        this.reasonClick(this. reaList[0])
+
+      },this.errmsg());
+      //需不需要这一步
+    },
+    errmsg: function () {
+
+      return msg => this.$message({
+        duration: 1000,
+        showClose: true,
+        message: msg,
+        type: 'error'
+      });
+
+    },//弹窗的错误警告
+    quxiao(){
+      //取消的时候内部弹窗也关闭
+      this.outerVisible=false;
+      this.$store.commit("saveModiFyname",false);
+    },
+    childReaClick(index,childReaId,reason){
+
+      this.qwerqwer = index
+      this.childReaId = childReaId
+      this.reason = reason
+    },
+    outClick() {
+
+      if(Number(this.checedList.isState)==1){
+        this.$message.error("此菜品不能奉送！！！");
+        this.$store.commit("saveModiFyname",false);
+        this.outerVisible=false;
+        this.innerVisible = false;
+      //  this.outerVisible = false;
+
+      }else{
+       //如果reson有值就不谈了
+       console.log(this.reason+'我是空就不能送')
+        if(this.reason!=''){
+          this.innerVisible=true;
+        }else{
+          this.$message.error("请选择奉送理由！！！")
+        }
+
+
+      }
+    },
+    reasonClick(index){
+      console.log(index)
+      console.log(22)
+      this.qwerqwre = index;
+      this.orderId = this.$store.state.userInfo.shop.orderId;
+      const params = {
+        url: "OR910007",
+        data: {
+          branch: "1001",
+          type: "1",
+        }
+      };
+      this.api.post(params, res => {
+
+       this.childReason = index
+
+      },this.errmsg());
+    },
+    innerClick() {
+
+      let branch = this.$store.state.userInfo.shop.branch;
+      let channel = this.$store.state.userInfo.shop.channel;
+      const params = {
+        url: "POS00014",
+        data: {
+          branch: branch,
+          channel:channel,
+          ids:this.checedList.id,
+          isState:"2",
+          reason:this.reason,
+        }
+      };
+      let _t=this;
+      this.api.post(params, res => {
+        this.$store.commit("saveRefreshMenu",true);
+        //this.$store.commit("saveModiFyname",false);
+        this.$emit('diaLog');
+        this.innerVisible = false;
+        this.outerVisible=false;
+      }, this.errmsg());
+      this.$store.commit("saveModiFyname",false);
+     // this.outerVisible=false;
+    }
+  }
+};
+</script>
+
+<style lang="scss">
+.active {
+  background: #1bbc9b !important;
+  color: #ffffff !important;
+  span {
+    color: #ffffff !important;
+  }
+}
+.ourOffer{
+  .el-dialog {
+    background: #ffffff;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+    width: 500px;
+    .el-dialog__header {
+      width: 100%;
+      height: 60px;
+      padding-top: 20px;
+      .el-dialog__title {
+      font-family: MicrosoftYaHei;
+      font-size: 20px;
+      color: #2d2d2d;
+      margin: 0 45%;
+      }
+    }
+    .el-dialog__body {
+        padding: 0;
+        height: 185px;
+    }
+    .el-dialog__footer {
+        padding: 0;
+        text-align: center;
+        height: 98px;
+        line-height: 98px;
+        .el-button--primary,
+        .el-button--default {
+          background: #dee0e7;
+          border-radius: 4px;
+          width: 160px;
+          height: 58px;
+        }
+        .el-button--primary,
+        .el-button--default span {
+          font-family: MicrosoftYaHei;
+          font-size: 20px;
+          color: #989898;
+        }
+      }
+  }
+}
+.outTitle {
+  width: 100%;
+  height: 48px;
+  padding: 0 20px;
+  display: flex;
+  background: #efefef;
+  justify-content: flex-start;
+  div {
+    border-radius: 4px;
+    width: 96px;
+    height: 100%;
+    text-align: center;
+    line-height: 48px;
+    font-size: 16px;
+    color: #989898;
+  }
+}
+.outList {
+  flex: 1;
+  width: 100%;
+  padding: 16px 20px;
+  display: flex;
+  div {
+    background: #ffffff;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    width: 86px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    font-size: 14px;
+    color: #2d2d2d;
+    margin-right: 16px;
+    margin-bottom: 16px;
+  }
+  div:nth-child(6n) {
+    margin-right: 0;
+  }
+  .active {
+    background: #1bbc9b;
+    color: #ffffff;
+  }
+}
+
+//第二次弹出框
+.innerDialog {
+  .el-dialog {
+    background: #ffffff;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+    width: 410px;
+    height: 204px;
+    padding: 20px 30px;
+    .el-dialog__header {
+      padding: 0;
+      height: 20px;
+      text-align: center;
+      .el-dialog__title {
+        font-family: MicrosoftYaHei;
+        font-size: 20px;
+        color: #2d2d2d;
+        margin: 0;
+      }
+    }
+    .el-dialog__body {
+      height: 86px;
+      text-align: center;
+      line-height: 86px;
+      span {
+        font-family: MicrosoftYaHei;
+        font-size: 16px;
+        color: #2d2d2d;
+      }
+    }
+    .el-button--default {
+          background: #dee0e7;
+          border-radius: 4px;
+          width: 160px;
+          height: 58px;
+          span{
+           font-family: MicrosoftYaHei;
+            font-size: 20px;
+            color: #989898;
+          }
+    }
+  }
+}
+</style>

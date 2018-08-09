@@ -1,0 +1,24 @@
+//选择项
+//验证
+let moren=function () {
+
+}
+let verification={
+  //正整数
+  zheng(msg,callback=moren) {
+    var reg = new RegExp("^(\\d|[1-9]\\d|100)$");
+
+      let num=Number(msg);
+      return reg.test(num)&&Number(num)>0&&num>=0&&num<=100
+  },
+  //正整数保留两位小数
+  decimal(msg,callback=moren){
+
+    let _z=/^[0-9]+([.]{1}[0-9]{1,2})?$/;
+
+    return !_z.test(msg)
+
+  }
+};
+
+export default verification

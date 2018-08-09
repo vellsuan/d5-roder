@@ -1,0 +1,43 @@
+										<table>
+											<thead>
+												<tr>
+													<th width="12%">国际码</th>
+													<th width="20%">名称</th>
+													<th width="12%">单价</th>
+													<th width="12%">数量</th>
+													<th width="12%">折扣</th>
+													<th width="12%">金额</th>
+													<th width="12%">优惠</th>
+													<th width="8%">操作</th>
+												</tr>
+											</thead>
+											<tbody>
+												<% for(var i=0;i<list.length;i++){
+															var proNum = 0;
+															var price = 0;
+															proNum += Number(list[i].num);
+															price += Number(list[i].num)*Number(list[i].lessMoney);
+															var zhekouPrice = 0;
+															if(list[i].oneMoney-list[i].lessMoney>0){
+																zhekouPrice = list[i].oneMoney-list[i].lessMoney;
+															}
+												%>
+												<tr class="scanTr modify_flag">
+													<td class="guobiaoma" data-key=<%=list[i].id%>><%=list[i].interCode%></td>
+													<td class="name"><%=list[i].productName%></td>
+													<td><%=Util.formatCurrency(list[i].lessMoney)%></td>
+													<td class="num">
+																<div class="product_calculate">
+																	<div class="product_del proshow"><span style="cursor: pointer;"></span></div>
+																	<div class="product_num"><input class="modifyNumIpt" title="商品数量" check="required num" style="width:45px;text-align:center" type="text" data-old-value=<%=list[i].num%> value=<%=list[i].num%>></input></div>
+																	<div class="product_add proshow"><span style="cursor: pointer;"></span></div>
+																</div>
+													</td>
+													<td><%=Util.formatCurrency(zhekouPrice)%></td>
+													<td><%=Util.formatCurrency(price)%></td>
+													<td><%=Util.formatCurrency(list[i].disMoney)%></td>
+													<td><a class="delete" href="javascript:void(0);" val=<%=list[i].id%>>删除</a></td>
+												</tr>
+												<%}%>
+											</tbody>
+										</table>

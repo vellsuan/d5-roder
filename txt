@@ -1,0 +1,143 @@
+账号：15000000000 B00019
+密码：888888 123456
+18522589655
+888888
+
+http://49.4.5.233:8071/index.html#/index
+//关于每次marginright最后一个元素会多出设置的距离
+应该改成元素两边各一半来解决最后一个多出的问题
+
+vue的缓存机制
+<keep-alive>
+
+接口api
+PPR00007 快捷分类商品列表右侧
+增 add菜
+//listItems.fen
+//listItems.price
+//computed
+//classifyList右侧
+price字段后台先定为price
+不确定
+ //选中颜色
+//关于$event传递子元素的问题 用$event.currentTarget
+奉送
+POS00014
+//POS00010下单接口
+退菜
+orderProductId
+//节点名称
+status
+ this.$store.commit("saveReturnData",this.bookInfo);
+//周二
+以退的不能进行其他任何修改
+除了重新下单
+
+已经催的不能等叫
+不是等叫的不能催
+
+
+
+
+          //左侧菜单栏点下去以后的状态
+          //固定折扣
+          1-11 //单品打折
+//初始化
+Initialization
+POS00010菜品列表
+搜索快捷
+data ：变量
+alert ：提示信息
+fun ：方法后缀
+ordersClick 下单
+inItMenu初始化
+整单折扣有问题 导致下不了单 1/11
+//起菜有bug 选择整单起菜的时候
+seachFoot 搜搜菜品
+
+http://192.168.75.211:9228/index.welcome.html#/signVerify
+
+crt 按住 选择变量或者fun能快速查找到引用位置
+ifDis 是否允许固定打折
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+redlistyle
+
+梳理一下
+664
+this.errrfun(this.msg)
+2132
+
+
+
+
+
+
+
+
+
+
+
+
+105 号桌
+店长账号18522589655  密码888888
+权限字段
+  PPR00007.do
+     isSaleProduct	是否可改名	string	值为2时，可改
+     isDiscount	是否可打折：0否1是	string
+  POS00012
+     isState	状态 0-正常 1-退 2-送 3-折	string
+
+  OR900209
+    isState	菜状态		【必填】状态 1-退
+    POS00010.do-查看订单商品详情（蒲佳佳）
+    discountType	折扣类型：0-正常；1-整单折扣；2-固定折扣	number
+    flag	是否存在单品折扣，0不存在，1存在	number
+    ifDis	是否允许折让 0-不允许 1-允许	string
+    快捷分类
+    isActivityPro ：0不可1未可
+
+    dishStatus == "1" 等
+
+1级=inIt 初始化
+  Public 公共方法
+  Click 选用方法
+
+componentsCall 组件回掉
+buttonState 按钮状态
+menuList 菜单选项
+label 标签
+fjpublish env -s
+npm i fjpublish -g
+
+
+
+
+
+
+
+
+this.footItems
+
+
+
+
+
+
+
+
+

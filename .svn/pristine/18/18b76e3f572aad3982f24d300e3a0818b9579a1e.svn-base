@@ -1,0 +1,143 @@
+
+<div class="mask-cont">
+	<div class="distribution-body">
+		<ul class="distribution agin-disyunt">
+			<li class="agin-disyuntmenu">
+				<div class="list-item">
+					<p class="food-istem package">套餐一</p>
+
+				</div>
+			</li>
+			<li class="agin-disyuntmenu">
+				<div class="list-item">
+					<p class="food-istem package">套餐一</p>
+
+				</div>
+			</li>
+			<li class="agin-disyuntmenu">
+				<div class="list-item">
+					<p class="food-istem package">套餐一</p>
+
+				</div>
+			</li>
+			<li class="agin-disyuntmenu">
+				<div class="list-item">
+					<p class="food-istem package">套餐一</p>
+
+				</div>
+			</li>
+			<li class="agin-disyuntmenu">
+				<div class="list-item">
+					<p class="food-istem package">套餐一</p>
+
+				</div>
+			</li>
+
+		</ul>
+	</div>
+	<div class="distribution-body">
+		<ul class="distribution">
+			<li class="agin-disyuntmenu">
+				<div class="list-item">
+					<p class="food-istem package">套餐一</p>
+
+				</div>
+			</li>
+			<li class="agin-disyuntmenu">
+				<div class="list-item">
+					<p class="food-istem package">套餐一</p>
+
+				</div>
+			</li>
+			<li class="agin-disyuntmenu">
+				<div class="list-item">
+					<p class="food-istem package">套餐一</p>
+
+				</div>
+			</li>
+			<li class="agin-disyuntmenu">
+				<div class="list-item">
+					<p class="food-istem package">新猪肉白菜包子</p>
+
+				</div>
+			</li>
+			<li class="agin-disyuntmenu">
+				<div class="list-item">
+					<p class="food-istem package">新猪肉白菜包子</p>
+
+				</div>
+			</li>
+
+		</ul>
+	</div>
+
+	<div class="distribution-body">
+		<ul class="distribution">
+			<li class="agin-disyuntmenu">
+				<div class="list-item">
+					<p class="food-istem package">套餐一</p>
+
+				</div>
+			</li>
+			<li class="agin-disyuntmenu">
+				<div class="list-item">
+					<p class="food-istem package">套餐一</p>
+
+				</div>
+			</li>
+			<li class="agin-disyuntmenu">
+				<div class="list-item">
+					<p class="food-istem package">套餐一</p>
+
+				</div>
+			</li>
+			<li class="agin-disyuntmenu">
+				<div class="list-item">
+					<p class="food-istem package">新猪肉白菜包子</p>
+
+				</div>
+			</li>
+			<li class="agin-disyuntmenu">
+				<div class="list-item">
+					<p class="food-istem package">新猪肉白菜包子</p>
+
+				</div>
+			</li>
+
+		</ul>
+	</div>
+
+	<div class="distribution-body">
+		<ul class="distribution-end">
+			<li class="agin-disyuntmenu">
+				<div class="list-item">
+					<p class="food-istem package">新猪肉白菜包子</p>
+
+				</div>
+			</li>
+			<li class="agin-disyuntmenu">
+				<div class="list-item">
+					<p class="food-istem package">套餐一</p>
+
+				</div>
+			</li>
+			<li class="agin-disyuntmenu">
+				<div class="list-item">
+					<p class="food-istem package">新猪肉白菜包子</p>
+
+				</div>
+			</li>
+			<li>
+				<div class="list-item previous list-item-pers">
+					上一页
+				</div </li>
+				<li>
+					<div class="list-item previous list-item-pers">
+						下一页
+					</div>
+				</li>
+
+		</ul>
+	</div>
+
+</div>

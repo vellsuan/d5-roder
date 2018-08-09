@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8">
+		<title>收银系统-登录</title>
+		<link rel="stylesheet" href="styles/com.css" />
+		<link rel="stylesheet" href="styles/login.css" />
+		<link rel="stylesheet" href="styles/jquery-ui.css" />
+		<link rel="stylesheet" href="styles/keyboard.css" />
+		<link rel="stylesheet" href="styles/keyboard-previewkeyset.css" />
+	</head>
+
+	<body id="loading">
+		<div class="wrapper">
+			<div class="header">
+				<div class="logo-left">
+					<img src="images/logo.png" alt="" />
+				</div>
+				<div class="logo-right">
+					<p class="general">电商业务综合处理平台</p>
+					<p class="lattice">Electrical business processing platform</p>
+				</div>
+				<div class="clearfix"></div>
+				<!-- 登录框-->
+				<div class="login-begin">
+					<form name="loginForm" method="" action="">
+						<table>
+							<tr class="tr-first">
+								<td>
+									<span></span>用户名 <input title="用户名" check="required" type="text" name="userName" id="userName">
+								</td>
+							</tr>
+							<tr class="tr-password">
+								<td><span></span>密&nbsp;&nbsp;&nbsp;码 <input check="required" title="密码" type="password" name="password" id="pwd" onkeyup="value=value.replace(/[^\d]/g,'')"></td>
+							</tr>
+						</table>
+					</form>
+					<div class="loin-btn">
+						<input id="loginBtn" type="button" value="登录" />
+					</div>
+				</div>
+				<!--登录框结束-->
+			</div>
+		</div>
+		<div id="commonDialog" class="showComDialog">
+			<div class="scanning">
+				<h5><span class="comDialogClose1"></span>温馨提示</h5>
+				<div class="merchandise">
+					<p></p>
+				</div>
+
+				<div class="end-confirms">
+					<input type="button" value="确认" class="confirm-order comDialogClose2" />
+				</div>
+
+			</div>
+		</div>
+		<script type="text/javascript">
+			//			window.onload = function() {
+			//				document.getElementById("userNmae").focus();
+			//			}
+		</script>
+		<script src="login.js"></script>
+	</body>
+
+</html>

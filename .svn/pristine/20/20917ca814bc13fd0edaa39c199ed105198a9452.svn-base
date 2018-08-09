@@ -1,0 +1,34 @@
+{
+  "code": "000000",
+  "message": "业务处理成功！",
+  "result": {
+    "page": {
+      "totalRowCount": 22,
+      "totalPage": 11,
+      "pageRowCount": 2,
+      "currentPageNu": 0,
+      "startPageRowCount": 0,
+      "endPageRowCount": 2,
+      "datas": [
+        {
+        	"date":"2016-09-18",
+        	"name":"零食套餐1",
+        	"addTime":"2016-09-15 下午14:00",
+        	"inTime":"2016-09-15 下午11:00",
+        	"beforeAmount":"100.00",
+        	"afterAmount":"80.00",
+        	"cash":"10"
+        },
+        {
+        	"date":"2016-09-18",
+        	"name":"零食套餐2",
+        	"addTime":"2016-09-15 下午14:00",
+        	"inTime":"2016-09-15 下午11:00",
+        	"beforeAmount":"100.00",
+        	"afterAmount":"80.00",
+        	"cash":"10"
+        }
+      ]
+    }
+  }
+}

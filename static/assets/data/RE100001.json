@@ -1,0 +1,72 @@
+{
+	"code": "000000",
+	"message": "业务处理成功！",
+	"result": {
+		"listRp": [
+			{
+				"id": 161,
+				"refundId": 162,
+				"orderSn": "201611080000061",
+				"productId": "18024",
+				"productName": "百岁山饮用天然矿泉水",
+				"refundNum": "1",
+				"refundPrice": 1.8,
+				"realPrice": 1.8,
+				"proImg": "group1/M00/00/09/wKhlB1gAfOOAfFQWAATurv5lBM8886.jpg"
+			}
+		],
+		"imageList": [],
+		"entity": {
+			"id": 162,
+			"refundSn": "20161108400000008",
+			"userId": 806165117,
+			"userName": "月色满园",
+			"userPhone": "13466659153",
+			"userAddr": "北京北京市朝阳区东三环北路甲26号博瑞大厦（项目名：高和萃）F1-110",
+			"fanxianMoney": 0,
+			"applyTime": 1478606200066,
+			"applyReason": "测试",
+			"applyType": "0",
+			"sendType": "0",
+			"isAll": "0",
+			"orderId": 5354,
+			"orderSn": "201611080000061",
+			"allPrice": 1.8,
+			"sendPrice": 0,
+			"refundScore": 0,
+			"refundCouponId": 0,
+			"couponMoney": 0,
+			"scoreMoney": 0,
+			"refundMoney": 1.8,
+			"curStatus": "0",
+			"buyerExpress": "",
+			"buyerExpressSn": "",
+			"buyerExpressFee": 0,
+			"salerExpress": "",
+			"salerExpressSn": "",
+			"salerExpressFee": 0,
+			"buyerTime": 0,
+			"salerTime": 0,
+			"channel": "0",
+			"isDelete": "0",
+			"addOrderTime": 1478596895082,
+			"reList": null,
+			"imageList": null
+		},
+		"listRefundLog": [
+			{
+				"id": 560,
+				"refundId": 162,
+				"auditId": "806165117",
+				"auditName": "",
+				"curStatus": "0",
+				"time": 1478606200124,
+				"refundSn": "20161108400000008",
+				"reason": "测试",
+				"channel": "1",
+				"isDelete": "0",
+				"remark": "提交申请"
+			}
+		]
+	}
+}

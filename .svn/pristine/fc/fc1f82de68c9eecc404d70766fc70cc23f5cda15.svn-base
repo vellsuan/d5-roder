@@ -1,0 +1,51 @@
+									
+					<%  var len = list.length;%>
+					<%for(var i = 0; i<len; i++){
+							
+					%>
+						<div class="rebounds">
+						<div class="sprang-left">
+							<p class="odd-numbers">单号: <em><span class="orderSN"><%=list[i].orderSn%></span></em></p>
+							<p class="odd-numbers">下单时间: <em><%=Util.formatTime(list[i].addTime,1)%></em></p>
+						</div>
+						<div class="sprang-right">
+							<input type="button" data-all-order="1" data-reader='0' orderSN='<%=list[i].orderSn%>' value="弹开" class="sprig-input noOrderExpend" />
+							<div class="info">
+								<div class="bounce-con">
+									<p class="odd-numbers"><span>收货人:</span> <em><%=list[i].acceptName%></em></p>
+									<p class="odd-numbers"><span style="text-align: center;">电话:</span><em class="telWidth"><%=list[i].tel%></em></p>
+									<p class="odd-numbers"><span>收货时间:</span> <em><%=Util.formatTime(list[i].hopeTimestamp,1)%></em></p>
+									<p class="odd-numbers"><span>收货备注:</span> <em><%=Util.limitCharacter(list[i].postscript,100)%></em></p>
+								</div>
+								<div class="clearfix"></div>
+								<div class="bounce-con2" style="border-bottom: none;">
+									<p class="odd-numbers">收货地址: <em><%=list[i].address%></em></p>
+								</div>
+								<div class="big-form modify-form">
+									<div class="form-open modify-form-open OrderTable modes-open">
+										<!--表格开始-->
+									</div>
+								</div>
+								<div class="clearfix"></div>
+								<div class="original-con">
+									<div class="original-con-left fleft original-con-left-goshop">
+										<p class="odd-numbers">原始订单金额： <em><%=Util.formatCurrency(Number(list[i].orgPrice)+Number(list[i].confirmCode))%></em></p>
+										<p class="odd-numbers">优惠金额: <em><%=Util.formatCurrency(Number(list[i].orgPrice)-Number(list[i].allprice)+Number(list[i].confirmCode))%></em></p>
+										<p class="odd-numbers">运费: <em><%=Util.formatCurrency(list[i].sendPrice)%></em></p>
+										<p class="odd-numbers">实付金额: <em><%=Util.formatCurrency(list[i].allprice)%></em></p>
+									</div>
+								</div>
+								<!--按钮-->
+								<div class="conbtn">
+									<% if(list[i].email && list[i].email =="1"){ %>
+										<input type="button" value="已打印" class="print" />
+									<%}else{%>
+										<input type="button" value="未打印" class="print" />
+									<%}%>
+								</div>
+								<!--按钮结束-->
+							</div>
+						</div>
+					</div>
+					<%}%>
+					<!--<div class="clearfix"></div>-->

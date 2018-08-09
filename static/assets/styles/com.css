@@ -1,0 +1,282 @@
+@charset "utf-8";
+
+/* CSS Document */
+
+body,
+div,
+dl,
+dt,
+dd,
+ul,
+ol,
+li,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+pre,
+form,
+fieldset,
+input,
+p,
+blockquote,
+th,
+td {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font-size: 14px;
+	color: #2d2d2d;
+	background: #fff;
+	font-family: "微软雅黑";
+}
+
+body,
+html {
+	height: 100%;
+}
+
+fieldset,
+img {
+	border: 0;
+	display: block;
+}
+
+ol,
+ul {
+	list-style: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-size: 100%;
+}
+
+em {
+	font-style: normal;
+}
+
+input,
+button,
+select,
+textarea {
+	outline: none;
+	border: 0;
+}
+
+textarea {
+	resize: none;
+}
+
+a {
+	color: #626262;
+	/*text-decoration: none;*/
+}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{
+    -webkit-appearance:textfield;
+}
+.font16pt{
+	font-size: 16px;
+}
+a:hover {
+	color: #328ed1;
+	text-decoration: none;
+}
+
+.clearfix:after {
+	content: "";
+	visibility: hidden;
+	height: 0;
+	display: block;
+	clear: both;
+}
+
+.clearfix {
+	zoom: 1;
+}
+
+.fleft {
+	float: left;
+}
+
+.fright {
+	float: right;
+}
+
+.positionR {
+	position: relative;
+}
+
+.positionA {
+	position: absolute;
+}
+
+.positionF {
+	position: fixed;
+}
+
+.tleft {
+	text-align: left;
+}
+
+.tcenter {
+	text-align: center;
+}
+
+.tright {
+	text-align: right;
+}
+
+.mauto {
+	margin: 0 auto;
+}
+
+.cursor {
+	cursor: pointer;
+}
+
+.disInline {
+	display: inline-block;
+}
+
+.disBlock {
+	display: block;
+}
+
+.disNone {
+	display: none;
+}
+
+.borRadius {
+	border-radius: 5px;
+}
+
+.borNone {
+	border: 0!important;
+}
+
+li {
+	list-style: none;
+}
+
+.wrapper {
+	min-width: 800px;
+	width: 100%;
+	height: 100%;
+	min-height: 600px;
+	
+}
+
+.fleft {
+	float: left;
+}
+
+.fright {
+	float: right;
+}
+
+::-webkit-scrollbar {
+	width: 40px;
+	height: 6px;
+}
+
+::-webkit-scrollbar-track-piece {
+	background-color: #eee;
+	margin: -2px;
+}
+
+::-webkit-scrollbar-thumb {
+	background: #aaa;
+	min-height: 150px;
+	min-width: 150px;
+	border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:vertical:hover {
+	background: #555555
+}
+
+::-webkit-scrollbar-thumb:horizontal:hover {
+	background: #555555
+}
+
+#wrapper {
+	position: absolute;
+    z-index: 1;
+    top:117px;
+    bottom: 68px;
+    left: 13px;
+    overflow: hidden;
+    right: 13px;
+    background-color: #fff;
+    border-radius: 0;
+}
+.leftPad,
+.rightPad {
+    width: 13px;
+}
+
+.leftPad {
+    float: left;
+}
+.rightPad {
+    float: right;
+}
+#scroller {
+	position: absolute;
+	z-index: 1;
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+	width: 100%;
+	-webkit-transform: translateZ(0);
+	-moz-transform: translateZ(0);
+	-ms-transform: translateZ(0);
+	-o-transform: translateZ(0);
+	transform: translateZ(0);
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	-webkit-text-size-adjust: none;
+	-moz-text-size-adjust: none;
+	-ms-text-size-adjust: none;
+	-o-text-size-adjust: none;
+	text-size-adjust: none;
+}
+
+.jiedanPage {	
+	display: block;
+	position: relative;
+	float: right;
+}
+
+.showComDialog .contentArea > div{
+	text-align: center;
+}
+.showComDialog .contentArea .contentMessage{
+	line-height: 130px;
+}
+.showComDialog .contentArea input[type=button]{
+	width: 109px;
+    height: 46px;
+    border-radius: 5px;
+    margin: 0 10px;
+    text-align: center;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+}
+.showComDialog .contentArea .ok{
+	background-color: #389fff;
+}
+.openBgColor{
+	background-color: #dee0e7 !important;
+}

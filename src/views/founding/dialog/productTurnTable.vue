@@ -1,0 +1,1056 @@
+<template>
+    <el-dialog title="单品转台" :visible.sync="dialogVisible" width="720px" top="calc((100vh - 720px)/2)" class="productTurnTable" center>
+    <div class="dialog-body-left">
+        <div class="left-details">
+            <div class="left-details-top">
+                <div class="tableNo">
+                    <el-button @click="selectTable(1)">{{leftTable}}</el-button>
+                </div>
+                <div class="billNumber" >
+                    <p>转出账单</p>
+                    <p>{{leftBillNumber}}</p>
+                </div>
+            </div>
+            <div class="left-details-table">
+                <el-table ref="singleTable" :data="leftBill" highlight-current-row @row-click="handleCurrentChange" fit>
+                    <el-table-column property="productName" label="菜品名称" width="121">
+                    </el-table-column>
+                    <el-table-column property="lessMoney"  width="80" label="单价">
+                    </el-table-column>
+                    <el-table-column property="num"  width="65" label="数量">
+                    </el-table-column>
+                </el-table>
+            </div>
+        </div>
+        <div class="left-details-button">
+            <el-pagination
+            :page-size="7"
+            @current-change="leftPage"
+            :current-page.sync="currentPage"
+            :total="totalRowCount"
+            layout="prev,next"
+            prev-text="上一页"
+            next-text="下一页"
+            >
+            </el-pagination>
+        </div>
+    </div>
+    <div class="dialog-body-main">
+        <div class="tableNumber">
+            <el-button @click="modifyNumber">{{selectNumber}}</el-button>
+        </div>
+        <div class="turnTable">
+            <el-button class="left-arrow"  @click="leftTurnDish"><span></span></el-button>
+            <el-button class="right-arrow" v-bind:disabled = "isDisabled"  @click="rightTurnDish"><span></span></el-button>
+        </div>
+    </div>
+    <div class="dialog-body-right">
+        <div class="right-details">
+            <div class="right-details-top">
+               <div class="tableNo">
+                    <el-button @click="selectTable(2)">{{rightTable}}</el-button>
+                </div>
+                <div class="billNumber">
+                    <p>转入账单</p>
+                    <p>{{rightBillNumber}}</p>
+                </div>
+            </div>
+            <div class="right-details-table">
+                <el-table ref="singleTable1" :data="rightBill.slice((currentPage1-1)*7,currentPage1*7)" highlight-current-row @row-click="handleCurrentChange1" fit>
+                    <el-table-column property="productName" label="菜品名称" width="121">
+                    </el-table-column>
+                    <el-table-column property="lessMoney"  width="80" label="单价">
+                    </el-table-column>
+                    <el-table-column property="num"  width="65" label="数量">
+                    </el-table-column>
+                </el-table>
+            </div>
+        </div>
+         <div class="right-details-button">
+            <el-pagination
+            :page-size="7"
+            @current-change="rightPage"
+            :current-page.sync="currentPage1"
+            :total="rightBill.length"
+            layout="prev,next"
+            prev-text="上一页"
+            next-text="下一页"
+            >
+            </el-pagination>
+            <!-- <div class="turn-page">
+                <el-button class="tableNumber" @click="pageccc" v-bind:disabled = "isDisabled">
+                    <span>上一页</span>
+                </el-button>
+                <el-button class="tableNumber" @click="pageadd" v-bind:disabled = "isDisabled1">
+                    <span>下一页</span>
+                </el-button>
+            </div> -->
+        </div>
+    </div>
+    <el-dialog title="选择桌位" :visible.sync="outerVisible" top="20vh" id="selectTable" custom-class="selectTable" center append-to-body>
+        <div class="tableList">
+            <div v-for="(item,index) in resTable" :key="item.id" >
+                <el-button class="tableNumber" plain @click="turnTable(item,index)" :class="{active:index==flag}">{{item.number}}</el-button>
+            </div>
+            <div class="turn-page" v-show="show">
+                <el-button class="tableNumber" @click="pageUp">
+                    <span class="left-arrow"></span>
+                </el-button>
+                <el-button class="tableNumber" @click="pageDown">
+                    <span class="right-arrow"></span>
+                </el-button>
+            </div>
+        </div>
+        <div slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="selectTableNumber">确定</el-button>
+            <el-button @click="outerDialog">取消</el-button>
+        </div>
+    </el-dialog>
+
+    <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="onSubmit">确认</el-button>
+        <el-button @click="outsideDialog">取消</el-button>
+    </span>
+    </el-dialog>
+</template>
+
+<script>
+import { mapState,mapMutations } from 'vuex';
+  export default {
+    data() {
+      return {
+        show:false,                         //分页按钮显示
+        dialogVisible: false,               //弹框显示
+        outerVisible: false,                //选择桌位弹窗显示
+        currentPage:1,                      //左侧列表当前页
+        currentPage1:1,                     //右侧列表当前页
+        totalPage:0,                        //左侧列表总页数
+        totalPage1:1,                       //右侧列表总页数
+        totalRowCount:0,                    //左侧数据总条数
+        totalRowCount1:1,                   //右侧数据总条数
+        multipleSelection:[],
+        selectNumber:1,                     //选中菜品的数量
+        item:{},
+        leftTable:"选择",                   //左侧按钮显示桌子号
+        leftBillNumber:"",                  //左侧账单编号
+        leftBill:[],                       //左侧账单列表
+        rightTable:'选择',                  //右侧按钮显示桌子号
+        rightBillNumber:"",                 //右侧账单编号
+        rightBill:[],                       //右侧侧账单列表
+        tableLOrder:'',
+        tableROrder:'',
+        currentPageNum:1,                   //桌位列表分页
+        pageCount:26,                       //桌位列表每页显示条数
+        resTable:{},                        //桌位列表数据
+        flag:null,                          //桌位列表选中的标识
+        val: '',                            //根据此值判断左边（右边）点中的选择table按钮
+        leftTurnDishVal : {},               //右列向左列传递数据时
+        rightTurnDishVal : {},              //左列像右列传递数据时
+        arrpage:0,
+        newall:[[]],
+        jhkarr:[],
+        pagenum:0,
+        pagenew:0,
+        isDisabled : true,
+        isDisabled1 : true,
+        righttoOrderId : "",
+        lefttoOrderId : "",
+        orderProductIds:[],                 // 订单产品ID
+        nums:[]                             // 产品数量
+      };
+    },
+    methods: {
+        setCurrent(row,val) {
+            if(val == 1){
+                this.$refs.singleTable1.setCurrentRow();
+                this.$refs.singleTable.setCurrentRow(row);
+            }else if(val == 2){
+                this.$refs.singleTable.setCurrentRow();
+                this.$refs.singleTable1.setCurrentRow(row);
+            }else{
+                this.$refs.singleTable1.setCurrentRow();
+                this.$refs.singleTable.setCurrentRow();
+            }
+
+        },
+        //判断左侧选中值是否存在右侧数组
+        jk(){
+            for(let i = 0; i< this.rightBill.length;i++){
+                if(this.rightBill[i].id==this.rightTurnDishVal.id){
+
+                    return true
+                }
+            }
+            return false
+        },
+        //左侧table点击选中改变的时候触发
+        handleCurrentChange(val) {
+            Object.assign(this.rightTurnDishVal,val)
+            this.setCurrent(val,1)
+            this.selectNumber = val.num;
+            if(this.jk()){
+                this.isDisabled = true;
+            }else{
+                this.isDisabled = false
+            }
+        },
+        //右侧table点击选中改变的时候触发
+        handleCurrentChange1(val) {
+            Object.assign(this.leftTurnDishVal,val)
+            this.setCurrent(val,2)
+            this.selectNumber = val.num;
+        },
+        // 左侧列表分页按钮
+        leftPage(val){
+            this.val = 1;
+            this.orderDetail(this.tableLOrder,val)
+        },
+        //右侧列表自己做的分页
+        rightPage(val){
+            this.val = 2;
+            this.orderDetail(this.tableROrder,val)
+        },
+        //点击选择弹窗渲染桌位列表
+        selectTable(val){
+        //	this.resTable = {};
+            this.val = val;
+            this.flag = null;
+            if(val == 1){
+                const params = {
+                    url: 'TB000014',
+                    data: {
+                        shopSn : this.userInfo.shop.shopSn,
+                        //shopSn : "B007007",
+                        currentPageNum:this.currentPageNum,
+                        pageCount:this.pageCount,
+                        tableOrder:this.tableROrder
+                    }
+                }
+
+                this.api.post(params, resTable=> {
+
+                    if(resTable.page.datas.length > 0){
+                        this.show = true;
+                        this.resTable = resTable.page.datas;
+                        this.outerVisible = true;
+                    }
+                },msg=>{
+                    this.currentPageNum = this.currentPageNum -1;
+                    if(this.currentPageNum < 1){
+                        this.currentPageNum = 1;
+                    }
+                    this.$alert('已经没有更多了!', '提示',{
+                        closeOnClickModal:true,
+                        center: true,
+                    });
+                    return false;
+                });
+            }else{
+                const params = {
+                    url: 'TB000014',
+                    data: {
+                        shopSn : this.userInfo.shop.shopSn,
+                        //shopSn : "B007007",
+                        currentPageNum:this.currentPageNum,
+                        pageCount:this.pageCount,
+                        tableOrder:this.tableLOrder
+                    }
+                }
+                this.api.post(params, resTable=> {
+                     console.log(resTable.page.datas)
+                    if(resTable.page.datas.length > 0){
+                        this.show = true;
+                        this.resTable = resTable.page.datas;
+                        this.outerVisible = true;
+                    }
+                },msg=>{
+                    this.currentPageNum = this.currentPageNum -1;
+                    if(this.currentPageNum < 1){
+                        this.currentPageNum = 1;
+                    }
+                    this.$alert('已经没有更多了!', '提示',{
+                        closeOnClickModal:true,
+                        center: true,
+                    });
+                    return false;
+                });
+            }
+        },
+        //选择桌位列表的分页（上一页）
+        pageUp(){
+
+            this.currentPageNum = this.currentPageNum - 1;
+            if(this.currentPageNum < 1){
+                this.currentPageNum = 1;
+            }
+            this.selectTable(this.val);
+
+        },
+        //选择桌位列表的分页（下一页）
+        pageDown(){
+            this.currentPageNum = this.currentPageNum + 1;
+            this.selectTable(this.val);
+        },
+        //点击桌位列表中的某个座位
+        turnTable(item,index){
+            this.flag = index;
+            this.item = item;
+        },
+        //选择桌位显示
+        selectTableNumber(){
+            if(this.val == 1){
+                this.leftTable = this.item.number;
+                this.leftBillNumber = this.item.orderSn;
+                this.tableLOrder = this.item.tableOrder;
+                this.lefttoOrderId = this.item.orderId;
+                this.orderDetail(this.item.tableOrder,1);
+                this.outerVisible = false;
+                this.rightBill = [];
+            }else{
+                this.rightTable = this.item.number;
+                this.rightBillNumber = this.item.orderSn;
+                this.tableROrder = this.item.tableOrder;
+                this.righttoOrderId = this.item.orderId;
+                this.outerVisible = false;
+            }
+        },
+        //内层弹框取消
+        outerDialog(){
+            this.outerVisible = false;
+            this.flag = null;
+            this.resTable = {};
+        },
+        //外层弹窗取消
+        outsideDialog(){
+            Object.assign(this.$data, this.$options.data())
+        },
+        //订单详情
+        orderDetail(tableOrder,val){
+            if(this.val == 1){
+                const params = {
+                    url: 'POS00013',
+                    data: {
+                        channel:8,
+                        tableOrder : tableOrder,
+                        currentPageNum : val,
+                        pageCount : 7
+                    }
+                }
+                this.api.post(params, resleft=> {
+                    this.leftBill = resleft.page.datas;
+                    this.totalPage = Number(resleft.page.totalPage)
+                    this.totalRowCount = Number(resleft.page.totalRowCount)
+                });
+            }else{
+            //     const params = {
+            //         url: 'POS00013',
+            //         data: {
+            //             channel:8,
+            //             tableOrder : tableOrder,
+            //             currentPageNum : val,
+            //             pageCount : 7
+            //         }
+            //     }
+            //     this.api.post(params, resright=> {
+            //         this.rightBill = resright.page.datas;
+            //         this.totalPage1 = Number(resright.page.totalPage)
+            //         this.totalRowCount1 = Number(resright.page.totalRowCount);
+            //     });
+            }
+        },
+        modifyNumber(){
+            this.$prompt('请输入数量', '提示', {
+                cancelButtonText: '取消',
+                confirmButtonText: '确定',
+                cancelButtonClass: 'cancelBtn',
+                inputPattern: /^[1-9]\d*$/,
+                inputErrorMessage: '请填写正确的数量',
+                showClose :false,
+                center : true,
+                }).then(({ value }) => {
+                    if(value <= this.selectNumber){
+                        this.selectNumber = value;
+                        this.$message({
+                            duration:1000,
+                            type: 'success',
+                            message: '已选择数量'+  value + '!'
+                        });
+                    }else{
+                        this.$message({
+                            duration:1000,
+                            type: 'warning',
+                            message: '数量不得大于剩余菜品的总量!'
+                        });
+                    }
+                }).catch(() => {
+                this.$message({
+                    duration:1000,
+                    type: 'info',
+                    message: '取消输入'
+                });
+            });
+        },
+        // r=>l
+        leftTurnDish(){
+            if(this.rightBill.length > 0){
+                if(this.leftTurnDishVal.id){
+                    if(this.leftTurnDishVal.num-this.selectNumber>=0){
+                        this.rightBill.map((content,index)=>{
+                            if(content.id == this.leftTurnDishVal.id){
+                                content.num -= this.selectNumber
+                                this.leftTurnDishVal.num = content.num
+                                if(content.num == 0){
+                                    this.nums.splice(index,1)
+                                    this.orderProductIds.splice(index,1)
+                                    this.rightBill.splice(index,1)
+                                }
+                            }
+                        })
+                    }
+                }else{
+                    this.$message({
+                        duration:1000,
+                        type: 'warning',
+                        message: '请先选择需要取消转台的菜品!'
+                    });
+                }
+
+            }else{
+                this.$message({
+                    duration:1000,
+                    type: 'warning',
+                    message: '请先选择需要操作的账单!'
+                });
+            }
+        },
+        // l=>r
+        rightTurnDish(){
+            if(this.leftTable == "选择" && this.leftBillNumber == ''){
+                this.$message({
+                    duration:1000,
+                    type: 'warning',
+                    message: '请先选择左侧需要操作的账单!'
+                });
+            }else{
+                if(this.rightTable != "选择" && this.rightBillNumber != ''){
+                    if(this.rightTurnDishVal.id){
+                        let make = this.orderProductIds.indexOf(this.rightTurnDishVal.id)
+                        if(make == -1){
+                             let leftObj = {}
+                             Object.assign(leftObj,this.rightTurnDishVal)
+                             leftObj.num = this.selectNumber;
+                            this.rightBill.push(leftObj)
+                            this.orderProductIds.push(leftObj.id)
+                            this.nums.push(leftObj.num)
+                        }else{
+                            let vrNum = Number(this.selectNumber) + Number(this.nums[make])
+                            if(this.rightTurnDishVal.num-0 >= vrNum && this.rightTurnDishVal.num-0 >0){
+                                this.nums[make] = vrNum
+                                this.rightBill[make].num = vrNum
+                            }else{
+                               this.$message({
+                                    duration:1000,
+                                    type: 'warning',
+                                    message: '已达到当前菜品可转的最大数!'
+                                });
+                            }
+                        }
+                       // this.rightTurnDishVal = {}
+                    }else{
+                        this.$message({
+                            duration:1000,
+                            type: 'warning',
+                            message: '请先选择需要转台的菜品!'
+                        });
+                    }
+                }else{
+                    this.$message({
+                        duration:1000,
+                        type: 'warning',
+                        message: '请先选择右侧需要操作的账单!'
+                    });
+                }
+            }
+        },
+        //前端分页
+        rightPageVal(){
+            console.log(this.totalPage1);
+            console.log(this.totalRowCount1);
+            this.totalRowCount1 = this.rightBill.length + 1;
+            this.totalPage1 = (this.rightBill.length + 1) % 7  == 0 ? (this.rightBill.length + 1) / 7 : Math.ceil((this.rightBill.length + 1) / 7);
+
+        },
+        newARR(){
+
+        },
+        //右侧table的分页（上一页）
+        pageadd(){
+            this.arrpage++;
+            this.rightBill=this.newall[this.arrpage];
+        },
+         //右侧table的分页（下一页）
+        pageccc(){
+            this.arrpage--;
+            this.rightBill=this.newall[this.arrpage];
+            if(this.arrpage <= 1){
+                this.isDisabled = true;
+            }
+        },
+        //提交转台
+        onSubmit(){
+            if(this.righttoOrderId!='' && this.righttoOrderId!=null ){
+            const params = {
+                url: 'TB000009',
+                data: {
+                    nums:this.nums.join(),
+                    orderProductIds:this.orderProductIds.join(),
+                    toOrderId : this.righttoOrderId
+                }
+            };
+            this.api.post(params, res=> {
+                if(res){
+                    this.$alert('转台成功!', '提示',{
+                        closeOnClickModal:true,
+                        center: true,
+                    });
+                    Object.assign(this.$data, this.$options.data())
+                }
+            });
+          }else{
+              if(this.rightBillNumber != ''){
+                this.$message({
+                  duration:1000,
+                  type: 'warning',
+                  message: '请先选择需要转台的菜品!'
+                });
+              }else {
+                this.$message({
+                  duration:1000,
+                  type: 'warning',
+                  message: '请先选择右侧需要操作的账单!'
+                });
+              }
+            }
+        }
+    },
+    watch:{
+        newall(){
+            if( this.newall.length>1 && this.arrpage<this.newall.length){
+
+                this.isDisabled1 = false;
+            }else{
+                this.isDisabled1 = true;
+            }
+            if(this.newall.length-1<1){
+                this.isDisabled = true;
+            }else{
+                this.isDisabled = false;
+            }
+        }
+    },
+    computed: {
+        ...mapState([
+            'userInfo'
+        ]),
+    },
+  };
+</script>
+
+<style lang="scss">
+    #app{
+        .productTurnTable{
+            .el-dialog{
+                height: 674px;
+                border-radius:4px;
+                background:#ffffff;
+                box-shadow:0 4px 8px 0 rgba(0,0,0,0.50);
+                .el-dialog__header{
+                    padding-top: 20px;
+                    padding-bottom: 30px;
+                    .el-dialog__close{
+                        display: none;
+                    }
+                }
+                .el-dialog__body{
+                    padding: 0 60px 30px;
+                    height: 526px;
+                    display: flex;
+                    .dialog-body-left{
+                        width: 268px;
+                        .left-details{
+                            background:#f9fdfe;
+                            border:1px solid #dee0e7;
+                            border-radius:4px;
+                            width:268px;
+                            height:443px;
+                            .left-details-top{
+                                display: flex;
+                                background:#efefef;
+                                border-radius:3px 3px 0 0;
+                                width:266px;
+                                height:98px;
+                                .tableNo{
+                                    margin: 20px 0 20px 20px;
+                                    .el-button{
+                                        padding: 12px 10px;
+                                        border:0;
+                                        background-image:linear-gradient(-180deg, #3adfcb 0%, #1bbc9b 100%);
+                                        box-shadow:0 2px 4px 0 rgba(0,0,0,0.50);
+                                        width:58px;
+                                        height:58px;
+                                        span{
+                                            font-size:20px;
+                                            color:#ffffff;
+                                            letter-spacing:0;
+                                            line-height:20px;
+                                            text-align:center;
+                                        }
+                                    }
+                                }
+                                .billNumber{
+                                    margin: 30px 0 0 10px;
+                                    p{
+                                        font-size:16px;
+                                        color:#989898;
+                                        line-height:16px;
+                                    }
+                                    p:last-child{
+                                        margin-top: 10px;
+                                        color:#2d2d2d;
+                                    }
+                                }
+                            }
+                            .left-details-table{
+                                width: 100%;
+                                .el-table{
+                                    .current-row>td{
+                                        background:#1bbc9b;
+                                        .cell{
+                                            color: #fff !important;
+                                        }
+                                    }
+                                    .el-table__header-wrapper{
+
+                                        .el-table__header{
+
+                                            .has-gutter{
+                                                tr{
+                                                background:#1bbc9b;
+                                                    th{
+                                                        height: 30px;
+                                                        padding: 0;
+                                                        font-size:12px;
+                                                        color:#ffffff;
+                                                        text-align:center;
+                                                    }
+                                                }
+                                            }
+
+                                        }
+                                    }
+                                    .el-table__body-wrapper{
+                                        .el-table__body{
+                                            tbody{
+                                                .el-table__row{
+                                                    background:#f9fdfe;
+                                                    width:268px;
+                                                    height:44px;
+                                                    td{
+                                                        border:0;
+                                                        text-align: center;
+                                                        width:268px;
+                                                        height:44px;
+                                                        div{
+                                                            font-size:12px;
+                                                            color:#2d2d2d;
+                                                            line-height:12px;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                .el-table::before {
+                                    height: 0;
+                                }
+                            }
+                        }
+                        .left-details-button{
+                            margin-top: 1px;
+                            width: 100%;
+                            text-align: center;
+                            .el-pagination{
+                                button{
+                                    padding: 0;
+                                    span{
+                                        padding-top: 15px;
+                                        border: 0;
+                                        background-image:linear-gradient(-180deg, #3adfcb 0%, #1bbc9b 100%);
+                                        border-radius:4px;
+                                        width:98px;
+                                        height:48px;
+                                        font-size:16px;
+                                        color:#ffffff;
+                                        line-height:16px;
+                                        text-align:center;
+                                    }
+                                }
+                                .btn-next{
+                                    span{
+                                        margin-left: 10px;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .dialog-body-main{
+                        width: 60px;
+                        .tableNumber{
+                            margin-top: 120px;
+                            .el-button{
+                                border: 0;
+                                border-radius: 0;
+                                background:#efefef;
+                                width:60px;
+                                height:48px;
+                                color:#2d2d2d;
+                                font-size:16px;
+                                line-height:16px;
+                            }
+                        }
+                        .turnTable{
+                            margin-top: 20px;
+                            display: flex;
+                            flex-direction:column;
+                            .left-arrow{
+                                border: 0;
+                                margin-bottom: 10px;
+                                border-radius: 0;
+                                background:#1bbc9b;
+                                width:60px;
+                                height:48px;
+                                span{
+                                    display: block;
+                                    width: 12px;
+                                    height: 21px;
+                                    background:url(../../../assets/images/left-arrow.png) center no-repeat;
+                                }
+                            }
+                            .right-arrow{
+                                padding-left: 25px;
+                                margin-top: 10px 0 0 0;
+                                border: 0;
+                                border-radius: 0;
+                                background:#1bbc9b;
+                                width: 60px;
+                                height:48px;
+                                span{
+                                    display: block;
+                                    width: 12px;
+                                    height: 21px;
+                                    background:url(../../../assets/images/right-arrow.png) center no-repeat;
+                                }
+                            }
+                            .el-button+.el-button{
+                                margin-left: 0;
+                            }
+                        }
+
+                    }
+                    .dialog-body-right{
+                        width: 270px;
+                        .right-details{
+                            background:#f9fdfe;
+                            border:1px solid #dee0e7;
+                            border-radius:4px;
+                            width:268px;
+                            height:443px;
+                            .right-details-top{
+                                display: flex;
+                                background:#efefef;
+                                border-radius:3px 3px 0 0;
+                                width:266px;
+                                height:98px;
+                                .tableNo{
+                                    margin: 20px 0 20px 20px;
+                                    .el-button{
+                                        border:0;
+                                        padding: 0;
+                                        background-image:linear-gradient(-180deg, #3adfcb 0%, #1bbc9b 100%);
+                                        box-shadow:0 2px 4px 0 rgba(0,0,0,0.50);
+                                        width:58px;
+                                        height:58px;
+                                        span{
+                                            font-size:20px;
+                                            color:#ffffff;
+                                            letter-spacing:0;
+                                            line-height:20px;
+                                            text-align:center;
+                                        }
+                                    }
+                                }
+                                .billNumber{
+                                    margin: 30px 0 0 10px;
+                                    p{
+                                        font-size:16px;
+                                        color:#989898;
+                                        line-height:16px;
+                                    }
+                                    p:last-child{
+                                        margin-top: 10px;
+                                        color:#2d2d2d;
+                                    }
+                                }
+                            }
+                            .right-details-table{
+                                width: 100%;
+                                .el-table{
+                                    .current-row>td{
+                                        background:#1bbc9b;
+                                        .cell{
+                                            color: #fff !important;
+                                        }
+                                    }
+                                    .el-table__header-wrapper{
+
+                                        .el-table__header{
+
+                                            .has-gutter{
+                                                tr{
+                                                background:#1bbc9b;
+                                                    th{
+                                                        height: 30px;
+                                                        padding: 0;
+                                                        font-size:12px;
+                                                        color:#ffffff;
+                                                        text-align:center;
+                                                    }
+                                                }
+                                            }
+
+                                        }
+                                    }
+                                    .el-table__body-wrapper{
+                                        .el-table__body{
+                                            tbody{
+                                                .el-table__row{
+                                                    background:#f9fdfe;
+                                                    width:268px;
+                                                    height:44px;
+                                                    td{
+                                                        border:0;
+                                                        text-align: center;
+                                                        width:268px;
+                                                        height:44px;
+                                                        div{
+                                                            font-size:12px;
+                                                            color:#2d2d2d;
+                                                            line-height:12px;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        & > .el-table__body{
+                                            background: #1bbc9b;
+                                        }
+                                    }
+                                }
+                                .el-table::before {
+                                    height: 0;
+                                }
+                            }
+                        }
+                        .right-details-button{
+                            margin-top: 1px;
+                            width: 100%;
+                            text-align: center;
+                            .turn-page{
+                                padding-top:2px;
+                                .el-button{
+                                    border: 0;
+                                    background-image:linear-gradient(-180deg, #3adfcb 0%, #1bbc9b 100%);
+                                    border-radius:4px;
+                                    width:98px;
+                                    height:48px;
+                                    span{
+                                        font-size:16px;
+                                        color:#ffffff;
+                                        letter-spacing:0;
+                                        line-height:16px;
+                                        text-align:center;
+                                    }
+                                }
+                            }
+                            .el-pagination{
+                                button{
+                                    padding: 0;
+                                    span{
+                                        padding-top: 15px;
+                                        border: 0;
+                                        background-image:linear-gradient(-180deg, #3adfcb 0%, #1bbc9b 100%);
+                                        border-radius:4px;
+                                        width:98px;
+                                        height:48px;
+                                        font-size:16px;
+                                        color:#ffffff;
+                                        line-height:16px;
+                                        text-align:center;
+                                    }
+                                }
+                                .btn-next{
+                                    span{
+                                        margin-left: 10px;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                .el-dialog__footer{
+                    height: 78px;
+                    padding: 0;
+                    .el-button--primary{
+                        border: 0;
+                        margin-right: 20px;
+                        background-image:linear-gradient(-180deg, #3adfcb 0%, #1bbc9b 100%);
+                        border-radius:4px;
+                        width:160px;
+                        height:58px;
+                        font-size:20px;
+                        color:#ffffff;
+                        line-height:20px;
+                        text-align:center;
+                    }
+                    .el-button--default{
+                        border: 0;
+                        background:#dee0e7;
+                        border-radius:4px;
+                        width:160px;
+                        height:58px;
+                        font-size:20px;
+                        color:#989898;
+                        line-height:20px;
+                        text-align:center;
+                    }
+                }
+            }
+        }
+    }
+    #selectTable{
+        .selectTable{
+            width: 620px;
+            .el-dialog__header{
+                padding: 20px 15px;
+                .el-dialog__headerbtn{
+                    display: none;
+                }
+            }
+            .el-dialog__body{
+                padding: 0 27px;
+                .tableList{
+                    width: 100%;
+                    height: 332px;
+                    background:#efefef;
+                    border-radius:4px;
+                    padding: 10px;
+                    display: flex;
+                    flex-flow:row wrap;
+                    align-content:flex-start;
+                    position: relative;
+                    .tableNumber{
+                        border: 0;
+                        margin: 10px;
+                        padding: 2px;
+                        border-radius: 0;
+                        background-image:linear-gradient(-180deg, #3adfcb 0%, #1bbc9b 100%);
+                        box-shadow:0 2px 4px 0 rgba(0,0,0,0.50);
+                        width:58px;
+                        height:58px;
+                        span{
+                            display: block;
+                            font-size:20px;
+                            color:#ffffff;
+                            text-align:center;
+                            .left-arrow{
+                                margin-left: 10px;
+                                display: block;
+                                width: 12px;
+                                height: 21px;
+                                background:url(../../../assets/images/left-arrow.png) center no-repeat;
+                            }
+                            .right-arrow{
+                                margin-left: 10px;
+                                display: block;
+                                width: 20px;
+                                height: 21px;
+                                background:url(../../../assets/images/right-arrow.png) center no-repeat;
+                            }
+                        }
+                    }
+                    .active{
+                        background-image:linear-gradient(-180deg, #3adfcb 0%, #1bbc9b 100%);
+                        box-shadow:0 2px 4px 0 rgba(0,0,0,0.50);
+                    }
+                    .turn-page{
+                        position: absolute;
+                        right: 10px;
+                        bottom: 10px;
+                        button:last-child{
+                            margin-left: 6px;
+                        }
+                    }
+                }
+            }
+            .el-dialog__footer{
+                padding: 0;
+                padding: 25px 0;
+                .dialog-footer{
+                    .el-button--primary{
+                        border: 0;
+                        background-image:linear-gradient(-180deg, #3adfcb 0%, #1bbc9b 100%);
+                        border-radius:4px;
+                        width:160px;
+                        height:58px;
+                        font-size:20px;
+                        color:#ffffff;
+                        text-align:center;
+                        margin-right: 20px;
+                    }
+                    .el-button--default{
+                        border: 0;
+                        background:#dee0e7;
+                        border-radius:4px;
+                        width:160px;
+                        height:58px;
+                        font-size:20px;
+                        color:#989898;
+                        letter-spacing:0;
+                        text-align:center;
+                    }
+                }
+            }
+        }
+    }
+    .el-message-box__wrapper{
+        .el-message-box{
+            .el-message-box__content{
+                .el-message-box__message{
+                    padding: 0;
+                }
+            }
+            .el-message-box__btns{
+                .cancelBtn{
+                    background:#dee0e7;
+                    color:#989898;
+                    float: right;
+                    margin-right: 20px;
+                }
+                .el-button--primary{
+                    margin-left: 0;
+                }
+            }
+        }
+    }
+</style>

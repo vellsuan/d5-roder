@@ -1,0 +1,37 @@
+{
+	"code": "000000",
+	"message": "业务处理成功！",
+	"list": {
+		"totalRowCount": 2,
+		"totalPage": 1,
+		"pageRowCount": 20,
+		"currentPageNu": 0,
+		"startPageRowCount": 0,
+		"endPageRowCount": 20,
+		"datas": [
+			{
+				"bulletinId": 101,
+				"bulletinName": "公告2",
+				"bulletinDtl": "1",
+				"status": null,
+				"effectDate": 2,
+				"expiryDate": null,
+				"creatorId": null,
+				"createTime": null,
+				"bulletinOrder": 2,
+				"remark": "备注2"
+			}, {
+				"bulletinId": 1,
+				"bulletinName": "公告1",
+				"bulletinDtl": "1",
+				"status": 2,
+				"effectDate": null,
+				"expiryDate": null,
+				"creatorId": null,
+				"createTime": null,
+				"bulletinOrder": 1,
+				"remark": "备注"
+			}
+		]
+	}
+}

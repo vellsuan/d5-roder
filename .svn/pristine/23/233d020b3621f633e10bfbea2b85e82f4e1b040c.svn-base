@@ -1,0 +1,14 @@
+{
+	"code": "000000",
+	"message": "业务处理成功！",
+	"result": {
+		"list": [
+			{
+				"id": 22,
+				"reason": "7天无理由退换",
+				"isDelete": "0",
+				"updateTime": 1478605295858
+			}
+		]
+	}
+}

@@ -1,0 +1,48 @@
+										<div class="big-form modify-form">
+											<div class="modify-form-open" style="padding-left: 10px;padding-right: 10px;">
+												<!--表格开始-->
+												<table cellspacing="0" cellpadding="0" class="matter_info">
+													<tbody>
+														<tr class="matter_info_header">
+															<th>日期</th>
+															<th>订单号</th>
+															<th>接单时间</th>
+															<th>入机时间</th>
+															<th>应付金额</th>
+															<th>实付金额</th>
+															<th>用户补现金</th>
+														</tr>
+														<%  var len = list.length;%>
+														<%for(var i = 0; i<len; i++){%>
+														<tr class="matter_info_cont">
+															<td><%=Util.formatTime(list[i].addTime,1)%></td>
+															<td><%=list[i].orderSn%></td>
+															<td><%=Util.formatTime(list[i].vouchertime,1)%></td>
+															<td><%=Util.formatTime(list[i].confirmTime,1)%></td>
+															<td><%=list[i].orgPrice%></td>
+															<td><%=list[i].allprice%></td>
+															<td>
+																<%
+																	var changePrice=list[i].changePrice;
+																	if($.inArray(list[i].orderStatus,[3,4,9,10])>-1){
+																		changePrice = 0;
+																	}
+																%>
+																<%=changePrice%>
+															</td>
+														</tr>
+														<%}%>
+
+													</tbody>
+												</table>
+											</div>
+										</div>
+										<div class="original-con">
+											<div class="original-con-left fleft">
+												<p class="odd-numbers">应付总金额： <em><%=result.sumOrgPrice%></em></p>
+												<p class="odd-numbers">实付总金额: <em><%=result.sumAllPrice%></em></p>
+												<p class="odd-numbers">用户补款金额: <em><%=result.sumChangePrice%></em></p>
+											</div>
+
+										</div>
+										<!--再次修改结束-->

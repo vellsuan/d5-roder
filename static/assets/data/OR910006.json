@@ -1,0 +1,24 @@
+{
+	"code": "000000",
+	"message": "业务处理成功！",
+	"result": {
+		"list": [
+			{
+				"id": 1,
+				"resaon": "天气原因",
+				"isDelete": "0",
+				"updateTime": 1474859390166
+			}, {
+				"id": 2,
+				"resaon": "餐厅已打烊哈哈",
+				"isDelete": "0",
+				"updateTime": 1474859390166
+			}, {
+				"id": 41,
+				"resaon": "配送员问题",
+				"isDelete": "0",
+				"updateTime": 1474859390166
+			}
+		]
+	}
+}

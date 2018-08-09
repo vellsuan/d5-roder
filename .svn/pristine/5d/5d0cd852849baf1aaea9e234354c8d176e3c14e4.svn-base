@@ -1,0 +1,45 @@
+         <div id="menu">
+							<!--tag标题-->
+							<ul id="nav">
+								<li><a href="#" class="selected">当天订单</a></li>
+								<li><a href="#" class="">已成功</a></li>
+								<li><a href="#" class="">失败订单</a></li>
+							</ul>
+							<div class="clearfix"></div>
+							<!--二级菜单-->
+							<div id="wrapper">
+							<div id="scroller">
+									<div id="orderQuery">
+									<div id="menu_con" class="cinall">
+										<div class="tag" style="display:block">
+											<!--搜索框-->
+											<form action="">
+												<div class="search-kung searchbox">
+													<p class="begin-time">开始时间：<input type="text" class="dateBtn"/></p>
+													<p class="end-time">结束时间：<input type="text" class="dateBtn1"></p>
+													<p class="source" style="display: none;">来源：
+														<select id="historyOrderSel">
+													             <option value ="0">bruno coffee</option>
+													             <option value ="1">百度</option>
+													             <option value ="2">美团</option>
+													             <option value="3">饿了么</option>
+													             <option value="4">京东到家</option>
+													    </select>
+													</p>
+													<p class="seach-input"><input id="historySearch" type="button" value="搜索" /></p>
+												</div>
+											</form>
+											<div id="historyOrder"></div>
+											<!--搜索框结束-->
+										</div>
+										<div class="tag" style="display:none">
+											<div id="successOrder"></div>
+										</div>
+										<div class="tag" style="display:none">
+											<div id="failedOrder"></div>
+										</div>
+									</div>
+									</div>
+							</div>
+							</div>
+		</div>

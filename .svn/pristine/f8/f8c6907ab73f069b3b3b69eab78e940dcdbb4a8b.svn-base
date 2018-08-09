@@ -1,0 +1,2747 @@
+<template>
+  <div class="iframe" style="flex:1;width:100%">
+    <section class="orderSystem">
+      <!--左侧-->
+      <ul ref="leftlist" class="sysNav">
+        <li @click="offerClick();leftcolor(0)"  >
+
+          <span>奉送</span>
+          <span>[F1]</span>
+        </li>
+        <li @click="footClick('no');leftcolor(1)">
+          <span>退菜</span>
+          <span>[F4]</span>
+        </li>
+        <li @click="nameClick();leftcolor(2)">
+          <span>修改菜目</span>
+          <span>名称</span>
+        </li>
+        <li @click="remarkClick();leftcolor(3)">
+          <span>单品备注</span>
+          <span>[F3]</span>
+        </li>
+        <li @click="wRemarkClick();leftcolor(4)">
+          <span>整单备注</span>
+        </li>
+        <li @click="hurryClick();leftcolor(5)">
+          <span>催菜</span>
+        </li>
+        <li @click="dishesClick();leftcolor(6)">
+          <span>起菜</span>
+        </li>
+        <li @click="calledClick();leftcolor(7)">
+          <span>等叫</span>
+        </li>
+        <li @click="changTcan();leftcolor(8)">
+          <span>更改套餐</span>
+          <span>明细</span>
+        </li>
+        <li @click="discountClick();leftcolor(9)">
+          <span>单品折扣</span>
+        </li>
+
+        <li :class="{moren:morenval,redlistyle:redlistyleval}" @click="screenClick()">
+          <span>{{touchTitle}}</span>
+        </li>
+      </ul>
+      <!--中间部分-->
+      <div class="sysBill">
+        <p class="billHaed">
+          <span>单号:{{lineItem.orderSn}}</span>
+          <span class="BillstarTime">{{this.$moment(lineItem.addTime).format("HH:mm:ss")}}</span>
+        </p>
+        <p class="billWaiter">
+          <span>人数:{{lineItem.person}}</span>
+          <span class="tableNum">桌号:{{lineItem.deskNo}}</span>
+          <span>操作员:{{lineItem.operName}}</span>
+        </p>
+        <nav class="billTitle">
+          <li></li>
+          <li>序号</li>
+          <li>菜目名称</li>
+          <li>单价</li>
+          <li>数量</li>
+          <li>小计</li>
+          <li>状态</li>
+        </nav>
+
+        <div ref="menuScroll" class="wrapper" style="height:225px;overflow:hidden;flex:1">
+
+          <ul ref="pulheight" class="billDetailList content">
+
+
+            <li v-if="successedList.length" v-for="(itemSuccess,index) in successedList" :key="'s'+index"
+                :class="{checkedItem:Number(itemSuccess.status)}" @click="choiceClick(itemSuccess)">
+
+                  <p class="ditch"></p>
+                  <span>{{index + 1}}</span>
+                  <span>{{itemSuccess.productName || ''}}</span>
+                  <span>{{itemSuccess.oneMoney || 0}}</span>
+                  <span>{{itemSuccess.num || 1}}</span>
+                  <span>{{Math.floor(Math.fround((itemSuccess.num * itemSuccess.oneMoney*((Number(itemSuccess.discountRate)||100))/100)*100))/100}}</span>
+                  <p class="stateShow">{{changeStatus(itemSuccess)}}</p>
+                  <div class="padingten">
+                    {{itemSuccess.remark || ''}}
+                  </div>
+                  <!--xia，已下单未下单状态；index当前下标；status是否高亮-->
+
+                  <span style="display: none">{{itemSuccess['xia'] = true}}{{itemSuccess['index'] = index}}{{index==succindex?itemSuccess.status=1:itemSuccess.status}}</span>
+                <div v-if='Number(itemSuccess.status)' class="opfList">
+                 <div class="opfListItem" v-for="(opfListItems,index) in itemSuccess['opfList']" >   <p class="ditchs"></p>
+                   <span></span>
+                   <span>{{opfListItems.productName || ''}}</span>
+                   <span>{{0}}</span>
+                   <span>{{opfListItems.productNum || 1}}</span>
+                   <span>{{0}}</span>
+                   <p class="stateShow">{{changeStatus(itemSuccess)}}</p>
+                 </div>
+                </div>
+            </li>
+
+            <!--颜色状态改变stauslist-->
+            <li v-if="greensList.length" :class="{checkedItem:Number(listItems.status)}"
+                v-for="(listItems,index) in greensList" @click="choiceClick(listItems)" :key="'d'+index">
+
+              <span></span>
+
+              <span>{{(successedList.length || 0) + index + 1}}</span>
+              <span>{{listItems.productName || ''}}</span>
+
+              <span>{{listItems.totalPrices || 0}}</span>
+              <span>{{listItems.fen || 1}}</span>
+              <span style="display: none">{{listItems.zhekoulv}}</span>
+
+              <!--增加自定义折扣率字段listItems.zhekoulv 要在乘前添加否则爆undefiend 默认1-->
+              <span>{{listItems.zhekou=Number(listItems.totalPrices || 1) * listItems.fen*(listItems.zhekoulv)/100}}</span>
+
+              <p v-if="Number(listItems.dishStatus)"  class="stateShow">等</p>
+              <p v-else class="stateShow"></p>
+              <div class="padingten">{{listItems.footString || ''}}{{listItems.allfootString || ''}}
+              </div>
+              <!--xia，已下单未下单状态；index当前下标；status是否高亮,以及回显以后的如有不适空就赋值--><!--如果不需要回显保持被选择状态那么可以删除currOption的判断-->
+              <span
+                style="display: none">{{listItems['xia'] = false}}{{listItems['index'] = index}}{{index==weixiadanindex?listItems.status=1:listItems.status}}<!--{{Number(listItems.status) == 1 ? currOption = listItems : currOption = currOption}}--></span>
+
+
+           <div v-if='Number(listItems.status)' class="opfList">
+                <div class="opfListItem" v-for="(opfListItems,index) in listItems['opfList']" >
+                  <p class="ditchs"></p>
+                  <span></span>
+                  <span>{{opfListItems.productName}}</span>
+                  <span>{{0}}</span>
+                  <span>{{(listItems.fen)*(opfListItems.productNum || 1) || 1}}</span>
+                  <span style="display: none">{{listItems.zhekoulv}}</span>
+                  <!--增加自定义折扣率字段listItems.zhekoulv 要在乘前添加否则爆undefiend 默认1-->
+                  <span>{{0}}</span>
+                </div>
+              </div>
+            </li>
+            <li></li>
+            <!--站位符-->
+          </ul>
+        </div>
+        <p class="billBorder"></p>
+        <div class="totalMoney">
+          <span>账单金额:{{zhengdanfu}}</span>
+          <span>应付金额:{{handleMoney}}</span>
+        </div>
+        <div class="waveImg"></div>
+        <!--计算器组件-->
+        <div class="calculatorBox">
+          <calcu-lator :jisuan="currOption" class="zDisCalculator"></calcu-lator>
+        </div>
+      </div>
+      <!--//右侧-->
+      <main class="sysMain">
+        <div class="search-dish"  v-bind:class="{ activeSearch: visible }">
+            <div>
+                <span class="searchLogo"></span>
+                <input type="text" @focus="show" v-model="searchDish" value="" class="searchDish" autofocus="autofocus"
+                       @keyup.enter="seachFoot" ref="searchDish" />
+            </div>
+        </div>
+        <div class="footList">
+          <el-row type="flex" :class="{footOrder:true}" :gutter="10">
+            <el-col :span="6"  v-for="(footItems,index) in classify" :key="index">
+
+              <div :class="{sameOrder:true,checkedItemstyle:Number(footItems.status)}" @click.stop="classifyClick(1,footItems.id,footItems);classbutton(index,footItems)">{{footItems.name}}</div>
+            </el-col>
+          </el-row>
+          <div class="footPage">
+            <!-- <div class="upPage" @click="pageClick"></div>
+            <div class="downPage" ></div> -->
+            <el-pagination
+              @current-change="handleCurrentChange"
+              :current-page.sync="currentPage"
+              :page-size="8"
+              layout="prev,next"
+              :total="totalRowCount">
+            </el-pagination>
+          </div>
+        </div>
+        <div class="mainList">
+          <div ref="menuScrolls" class="wrapper" style="height:460px;overflow:hidden;flex:1">
+            <ul class="content footsListScroll">
+              <!--:class="{ noneBg: items.stock == 0 ,activeSearchList:visible}"-->
+              <li class="productSyn"  v-for="(items,index) in classifyList"
+                  :key="index" @click="fyListClick(items,items.id)">
+                <div v-if="items.isActivityPro"><p>{{items.productName}}<span style="color: red">特</span></p></div>
+                <div v-else><p>{{items.productName}}</p></div>
+                <p v-if="items.isActivityPro">{{items.ap.price}}元/<span style="font-size:10px;">{{items.proSizeDescribe}}</span></p>
+                <p v-else>{{items.shopPrice}}元/<span style="font-size:10px;">{{items.proSizeDescribe}}</span></p>
+                <section class="hornIcon" v-if="(items.stock<=0)">估</section>
+              </li>
+            </ul>
+            <el-pagination
+              @current-change="handleCurrentChange1"
+              :current-page.sync="currentPage1"
+              :page-size="pagecounts"
+              layout="prev,next"
+              :total="totalRowCount1">
+            </el-pagination>
+          </div>
+        </div>
+        <!-- 键盘 -->
+        <div v-if="visible" class="touchKeyShow">
+          <!-- <input @focus="show" v-model="searchDish" value="" class="searchDish" autofocus="autofocus"
+                 @keyup.enter="seachFoot" ref="searchDish" /> -->
+        </div>
+
+        <div class="userSyn" v-else>
+          <el-row type="flex" ref="listpart.native" class="sysNavTep" :gutter="10" style="margin:0;">
+
+            <el-col :span="4">
+              <div  :class="{same:bluslist[0].key,partstyle:bluslist[0].val}"  @click="listport(0,modifyClick)">
+
+                <span>修改人数</span>
+              </div>
+            </el-col>
+            <el-col :span="4">
+              <div  :class="{same:bluslist[1].key,partstyle:bluslist[1].val}" @click="listport(1,messageClick)">
+                <span>客人留言</span>
+              </div>
+            </el-col>
+            <el-col :span="4">
+              <div :class="{same:bluslist[2].key,partstyle:bluslist[2].val}" @click="listport(2,getPrintData(4))">
+                <span>预打账单</span>
+                <span>[F5]</span>
+              </div>
+            </el-col>
+            <el-col :span="4">
+              <div  :class="{same:bluslist[3].key,partstyle:bluslist[3].val}" @click="listport(3,getPrintData(5))">
+                <span>打印点菜单</span>
+                <span>[F6]</span>
+              </div>
+            </el-col>
+            <el-col :span="4" >
+              <div  :class="{sameColor:bluslist[4].key,sameColortwo:bluslist[4].val}" @click="listport(4,ordersClick)">
+                <span>下单</span>
+                <span>[F9]</span>
+              </div>
+            </el-col>
+            <el-col :span="4">
+              <router-link :to="{ path: 'andasingle', query: { orderSn:lineItem.orderSn}}">
+                <div  :class="{sameColor:bluslist[5].key,same:true,partstyle:bluslist[5].val}" @click="listport(5)">
+                  <span>核单</span>
+                  <span>[F10]</span>
+                </div>
+              </router-link>
+            </el-col>
+            <el-col :span="4">
+              <div :class="{same:bluslist[6].key,partstyle:bluslist[6].val}" @click="listport(6,waiterClick)">
+                <span>修改服务员</span>
+              </div>
+            </el-col>
+            <el-col :span="4">
+              <div  :class="{same:bluslist[7].key,partstyle:bluslist[7].val}" @click="listport(7,canselClick)">
+                <span>整单取消</span>
+              </div>
+            </el-col>
+            <el-col :span="4">
+              <div  :class="{same:bluslist[8].key,partstyle:bluslist[8].val}" @click="listport(8,newLeaguerClick)">
+                <span>优惠券</span>
+              </div>
+            </el-col>
+            <el-col :span="4">
+              <div :class="{same:bluslist[9].key,partstyle:bluslist[9].val}" @click="listport(9,countClick)">
+                <span>打折</span>
+                <span>[F8]</span>
+              </div>
+            </el-col>
+            <el-col :span="4">
+              <div :class="{sameColor:bluslist[10].key,sameColortwo:bluslist[10].val}" @click="listport(10,menuClick)">
+                <span>付款</span>
+                <span>[F12]</span>
+              </div>
+            </el-col>
+            <el-col :span="4">
+
+                <div  :class="{sameColor:bluslist[11].key,sameColortwo:bluslist[11].val}" @click="listport(11,escClick)">
+                  <span>返回</span>
+                  <span>[ESC]</span>
+                </div>
+
+            </el-col>
+          </el-row>
+        </div>
+      </main>
+    </section>
+    <dia-logCue ref="diaCue" @logCue="dialogCue"></dia-logCue>
+    <dia-log ref="diaOffer" @diaLog="diaLogCall" :checedList="currOption"></dia-log>
+    <dia-foot ref="diaFoot" @diaFoot="diaFootCall" @diaFootzhe="diaFootCallzhe" :checedList="currOption" :juriType="jurisdiction"></dia-foot>
+    <dia-name ref="diaName" @diaName="diaNameCall" :noneItems="currOption"></dia-name>
+    <dia-remark ref="diaRemark" :titRemark="currOption"  :titleName="remarkName" :remarkList="greensList" @diaRemark="diaRemarkCall"></dia-remark>
+    <dia-hurry ref="diaHurry" @diaHurry="diaHurryCall" :checedList="currOption"></dia-hurry>
+    <dia-dishes ref="disDishes" @qicai="diaqicaisuCall" @dengjiaocl="diawaiterCall" :oderip="publicval" :checedList="currOption"
+                :titleName="disheskName" :odersn="lineItem.orderSn" :inpCon="inpName" :inpContain="inpConName"
+                :portType="portType"></dia-dishes>
+    <dia-dishess ref="dishess" @diaDishess="diaDishessCall"></dia-dishess>
+    <dia-discounts ref="disCount"  @danpin="diaDiscountsCall"  :inpContain="currOption" :yuanjia="currOption" ></dia-discounts>
+    <dia-message ref="disMessage" @aftermess="diaMessageCall"  :odersn="lineItem.orderSn"></dia-message>
+    <dia-waiter ref="disWaiter" @diaWaiter="diaWaiterCall" :waiteroreder="lineItem.orderSn"></dia-waiter>
+    <dia-modify ref="disModify" @diaModify="disModifyCall" :deskId="tablesId" :desval="lineItem.person"></dia-modify>
+    <dia-cancel ref="disCancel" @diaCancel="diaCancelCall"  :orderIdval="orderId" :tableIdval="tableId" :ketorder="this.publicval" :ketordersn="lineItem.orderSn"></dia-cancel>
+    <dia-discount ref="disDiscount" @diaDiscount="diaDiscountCall" :lenobj="greensList.length" :dazheobj="dazheobjval" :flagtype="flag" :zongjia="handleMoney" :kezhe="kezheval" :bukezhe="bukezheval" :zhangdan="tempPrice"></dia-discount>
+    <dia-memberentry ref="disMemberentry" @youhuiquan="youhuiquanCall" :orderData="prmval()" :orderIdval="orderId"></dia-memberentry>
+    <dia-can ref="diaCan"  @diaPartFuns="diaPartCalls" :package="changePackage" :shopSnId="shopSn" :changTcan="currOption.opfList"></dia-can>
+    <dia-part ref="diaPart" @diaPartFun="diaPartCall" :package="changePackage" :shopSnId="shopSn" ></dia-part>
+  </div>
+
+
+</template>
+<script>
+  import BScroll from "better-scroll";
+  import diaChangePart from "@/components/orderingSystem/changeParticulars";
+  import dialogOffer from "@/components/orderingSystem/dialogOffer";
+  import dialogRetFoot from "@/components/orderingSystem/dialogRetFoot";
+  import dialogTcan from "@/components/orderingSystem/changeTcan";
+  import dialogModifyName from "@/components/orderingSystem/dialogModifyName";
+  import sRemarks from "@/components/orderingSystem/sRemarks";
+  import hurryFoot from "@/components/orderingSystem/hurryFoot";
+  import dialogDishes from "@/components/orderingSystem/dialogDishes";
+  import sDiscount from "@/components/orderingSystem/sDiscount";
+  import dialogMessage from "@/components/orderingSystem/dialogMessage";
+  import changeWaiter from "@/components/orderingSystem/changeWaiter";
+  import modifyPeople from "@/components/orderingSystem/modifyPeople";
+  import cancelOrder from "@/components/orderingSystem/cancelOrder";
+  import dialogDiscount from "@/components/orderingSystem/dialogDiscount";
+  import calculator from "@/components/calculator";
+  import dialogMemberenTry from "@/views/dialog/memberentry";
+  import dialogDisheSs from "@/components/orderingSystem/dialogDisheSs";
+  import dialogCue from "@/components/orderingSystem/dialogCue";
+  export default {
+
+    components: {
+      //组件名称name
+      "dia-can":dialogTcan,//修改套餐明细
+      "dia-part":diaChangePart,//选择明细
+      "dia-log": dialogOffer,//奉送
+      "dia-foot": dialogRetFoot,//退菜
+      "dia-name": dialogModifyName,//修改菜名
+      "dia-remark": sRemarks,//单品备注
+      "dia-hurry": hurryFoot,//催菜
+      "dia-dishes": dialogDishes,//起菜
+      "dia-discounts": sDiscount,//单品折扣
+      "dia-message": dialogMessage,//客户留言
+      "dia-waiter": changeWaiter,//修改服务员
+      "dia-modify": modifyPeople,//修改人数
+      "dia-cancel": cancelOrder,//整单取消
+      "dia-discount": dialogDiscount,//打折
+      "calcu-lator": calculator,//MINI计算器
+      "dia-memberentry": dialogMemberenTry,//会员录入
+      'dia-dishess':dialogDisheSs,//下单或是退菜
+      "dia-logCue" :dialogCue
+    },
+    data() {
+      //变量
+      return {
+        userInfo:this.$store.state.userInfo,
+        //公共数据tableorder
+        publicval: this.public(),
+        //菜品数据
+        lineItem: {}, //订单详情
+        successedList: [],//以下单成功后菜品数据
+        greensList: [],//未下单菜品列表
+        parentLineItem: {},//订单详情父级
+        orgPrice:0,//以下单整单价格
+        allprice: 0,//实际付款
+        notPlace: 0,//未下单菜品金额
+        zhekoujia:{},//接收的折扣价格信息从整单打折组件里
+        dazheobjval:{},
+        kezheval:0,//可打折金额
+        bukezheval:0,//不可打折金额
+        kedazheprice:0,
+        bukedazheprice:0,
+        simpleLen: 0,//下单后列表长度
+        tablesId: "",
+        disheskName: "",
+        inpName: "",
+        inpConName: "",
+        portType: "",//2位等叫1为起菜
+        visible: false,//分类触屏
+        touchTitle: "触屏点餐",//按钮文字
+        searchDish: "",//菜品搜索框的值
+        input: null,//好像是计算器用的吧
+        classify: {}, //快捷分类菜单
+        classifyList: [], //快捷菜品列表
+        currOption: {},//当前菜品
+        succindex:undefined,//下单后的下标
+        weixiadanindex:undefined,//未下单的下标
+        //分页
+        totalRowCount: 0,  //菜品分类分页 总条数
+        totalPage: 0,      //菜品分类分页 总页
+        currentPage: 1,    //菜品分类分页 当前页
+        totalRowCount1: 0,  //菜品分类菜单分页 总条数
+        totalPage1: 0,      //菜品分类菜单分页 总页
+        currentPage1: 1,    //菜品分类菜单分页 当前页
+        quickId: "",        //菜品id
+        currentitem: '',
+        dataPage: {},
+        pagecounts:23,//页码
+        //备注信息
+        remarkName: '整单备注',
+        //判断单品还是全单
+        //权限
+        jurisdiction: '奉送',
+        //功能标识
+        funcFlagall: 'ZDQ0003',
+        //funcopenall:'1',
+        //全单
+        funcFlagtui: 'TC0002',
+        //funcopentui:'2',
+        //退菜
+        funcFlagSONG: 'FS00001',
+        //funcopensong:'3'
+        //奉送
+        //打折
+        funcallflod:'FS00002',
+        funonlyflod:'FSOOO03',
+        //弹窗设置
+        msg:null, //提示信息必要的默认值不知道他们为啥需要一个这个
+        mseage:'请选择菜品',
+        dalogtime:2000,
+        dilogtitle:'失败',
+        dilogtype:'error',
+        layout: "normal",//布局样式
+        chupingorSelect:false,
+        flag:0,//是否可进行单品或者整单打折
+        tableId:this.$route.query.id,
+        orderId:'',
+        listpartlist:[
+          { key:1,val:0},
+          { key:1,val:0},
+          { key:1,val:0},
+          { key:1,val:0},
+          { key:1,val:0},
+          { key:1,val:0},
+          { key:1,val:0},
+          { key:1,val:0},
+          { key:1,val:0},
+          { key:1,val:0},
+          { key:1,val:0},
+          { key:1,val:0}
+          ],
+        bluslist:[
+          { key:1,val:0},
+          { key:1,val:0},
+          { key:1,val:0},
+          { key:1,val:0},
+          { key:1,val:0},
+          { key:1,val:0},
+          { key:1,val:0},
+          { key:1,val:0},
+          { key:1,val:0},
+          { key:1,val:0},
+          { key:1,val:0},
+          { key:1,val:0}
+        ],
+        bluslistre:[
+          { key:1,val:0},
+          { key:1,val:0},
+          { key:1,val:0},
+          { key:1,val:0},
+          { key:1,val:0},
+          { key:1,val:0},
+          { key:1,val:0},
+          { key:1,val:0},
+          { key:1,val:0},
+          { key:1,val:0},
+          { key:1,val:0},
+          { key:1,val:0}
+        ],
+        restpartlist:[],
+        morenval:1,
+        redlistyleval:0,
+        shopSn:this.$store.state.userInfo.shop.shopSn,
+        calssTime:200,
+        modify:true,
+        discountRate:'',
+        zheRang:'',//折让价格
+        tempPrice:'',//原付价格
+        changePackage:{},
+        dangqiancaipin:{},//当前菜品
+        taocan:'0',
+        footItems:''
+      };
+    },
+    mounted() {
+      this.init();
+      this.dishesList(1);
+      let num=[6,3,1,7,5,8,9,2,4];
+      console.log(num.length)
+      let nuar=[]
+      let nn=9
+   /*   for(let i=0;i<num.length;i++){
+          let h=num[i+1]
+          num[i+1]=num[nn--]
+          num[i+1]=h;
+
+         // console.log(nuar.push(num.shift()))
+      }*/
+   //   console.log(nuar)
+
+    },
+    created () {
+      document.onkeydown= e => {
+        let key=window.event.keyCode;
+        if(key==112){
+          this.offerClick();
+          this.leftcolor(0)
+        }else if(key==113){
+          console.log('没有绑定');
+        }else if(key==114){
+          this.remarkClick();
+          this.leftcolor(3)
+        }else if(key==115){
+          this.footClick('no');
+          this.leftcolor(1)
+        }else if(key==116){
+          this.listport(2,this.getPrintData(4))
+        }else if(key==117){
+          this.listport(3,this.getPrintData(5))
+        }else if(key==118){
+          console.log('没用绑定F7');
+        }else if(key==119){
+          this.listport(9,this.countClick)
+        }else if(key==120){
+          this.listport(4,this.ordersClick)
+        }else if(key==121){
+          this.listport(5)
+          this.$router.push({ path: 'andasingle', query: { orderSn:this.lineItem.orderSn}})
+        }else if(key==122){
+          this.listport(4,this.ordersClick)
+        }else if(key==123){
+          this.listport(10,this.menuClick)
+        }else if(key == 27){
+          this.listport(11,this.escClick)
+        }
+      }
+    },
+    methods: {
+      //inIt
+      init() {
+        const params = this.prmval();
+        this.api.post(params, res => {
+          this.discountRate=res.discountRate;
+          //桌号人数等信息基本信息
+          this.lineItem = res.preEntity;
+          this.orderId=res.order && res.order.orderId ||0;
+          console.log(this.orderId);
+          this.parentLineItem = res;
+          this.successedList = res && res.opList || [];
+          //成功后菜品
+          this.scroolfun();
+          //_initScroll滚动初始化
+          this.tablesId = this.$route.query.id;
+          //tablesId修改服务员用
+          if (res.order == null) {
+            this.allprice = 0;
+            this.orgPrice=0;
+            this.kedazheprice=0;
+            this.bukedazheprice=0
+          } else {
+            this.orgPrice=res.order.orgPrice;
+            this.tempPrice=res.tempPrice;
+            this.allprice = res.order.allprice;
+            this.kezhebukezhe(res);
+          }
+          const state = this.$store.state;
+          let notUndfied = state.greensList[this.publicval];
+          //初始化调取如果不是undefiend就赋值
+          if (notUndfied !== undefined) {
+            this.greensList = state.greensList[this.publicval];
+          }
+          //响应式初始化添加状态stuats
+          //需要刷新后依然保持状态的用changColorchushihua  else changColor 并且在模板里放开<!--{{Number(listItems.status) == 1 ? currOption = listItems : currOption = currOption}}-->
+          //this.changColorchushihua(this.successedList, this.greensList, 'status');
+          this.changColor(this.successedList, this.greensList, 'status');
+          this.$store.commit("saveOrderId", res.preEntity.orderSn || "");
+          this.simpleLen = this.successedList.length || 0;
+        },this.errmsg())
+      },
+      //初始化Initialization 菜品列表fun
+      _initScroll() {
+        this.menuScroll = new BScroll(this.$refs.menuScroll, {
+          click: true
+        });
+        this.menuScrolls = new BScroll(this.$refs.menuScrolls, {
+          click: true
+        });
+      },
+      //滚动初始化
+      scroolfun () {
+        this.$nextTick(() => {
+          this._initScroll();
+        });
+      },
+      //Public
+      public() {
+        return this.$route.query.tableOrder
+      },
+      //获取tableOrder 公用
+      errmsg () {
+        return msg => this.$message({
+          duration: 1000,
+          showClose: true,
+          message: msg,
+          type: 'error'
+        });
+      },
+      //弹窗的错误警告
+      selectOption() {
+        if (JSON.stringify(this.currOption) == "{}") {
+          this.mseagelog();
+          //   this.$message.error('请选择菜品');
+          return
+        } else {
+          return true
+        }
+      },
+      //判断是否有选中项
+      prmval() {
+        const params = {
+          url: "POS00010",
+          data: {
+            tableOrder: this.publicval
+          }
+        };
+        return params;
+      },
+      //接口相同参数
+      ClearcurrItem () {
+        this.currOption = {};
+      },
+      //置空当菜品信息
+      choiceClick(listItems) {
+        this.yichuleft();
+        //初始化属性
+        //复制当前选中项
+        //下单未下单
+        this.currOption = listItems;
+
+        let xia = this.currOption.xia;
+        let indexselect = this.currOption.index;
+        //颜色改变
+        if (Number(listItems.status)) {
+
+          //都要初始化一下
+          this.changColor(this.successedList, this.greensList, 'status');
+
+          listItems.status = 0;
+          console.log(3333333)
+          //当前为0时候置空
+          this.ClearcurrItem();
+          // this.currOption = {};
+          this.add()
+        } else {
+          this.changColor(this.successedList, this.greensList, 'status');
+
+          listItems.status = 1;
+          this.add()
+        }
+
+
+      //  console.log(this.currOption)
+      //  console.log('我是选中项')
+
+      },
+      //选择当前项
+      empty(stRing,type=[]){
+           this[stRing]=type
+      },
+      //清空数据
+      add() {
+        this.$store.commit("saveFoodListBack", {
+          key: this.publicval,
+          val: this.greensList
+        });
+        //再添加一条保存当前的greenslist
+      },
+      //保存状态
+      commit(stRing,type){
+         this.$store.commit(stRing,type);
+       },
+      //提交状态
+      mseagelog(msg=this.mseage,tiem=this.dalogtime){
+        this.msg && this.msg.close();
+        this.msg = this.$notify({
+          title: this.dilogtitle,
+          message: msg,
+          type: this.dilogtype,
+          duration:tiem
+        });
+      },
+      sucesslog(msg=this.mseage,tiem=this.dalogtime){
+        this.msg && this.msg.close();
+        this.msg = this.$notify({
+          title: '成功',
+          message: msg,
+          type: 'success',
+          duration:500
+        });
+      },
+      //套餐明细
+      changTcan(){
+
+        if(this.selectOption()){
+          let xia=this.currOption.xia;
+          if (xia !== undefined) {
+            if (!xia) {
+              let  gren = this.greensList,
+                   len = gren.length;
+              if (len < 1) {
+                this.mseagelog("请选择一条未下单的菜品");
+              } else {
+                if(this.currOption.productId.indexOf('TC')!=-1){
+                  this.taocan='1';
+                  this.changePackage=this.currOption.productId;
+                  this.$refs.diaCan.outerVisible = true;
+                }else{
+                  this.mseagelog("请选择套餐！");
+                }
+              }
+            } else {
+              this.mseagelog("请选择一条未下单的菜品");
+            }
+          } else {
+            this.mseagelog("请选择一条未下单的菜品");
+          }
+        }
+      },
+      //Click
+       //选择一个商品未下单的清空下选择打折以后再去下单会保留原来的不清除
+      //快捷分类fun
+      dishesList(val) {
+      //  console.log(this.shopSn)
+        const params = {
+          //1套餐 0菜品 postFlag
+          url: "PR100029",
+          data: {
+            isShow: "1",
+            status: "0",
+            pageCount: "8",
+            currentPageNum: val,
+            shopSn:this.shopSn
+          }
+        };
+        this.api.post(params, res => {
+          this.classify = res.page.datas;
+          this.totalPage = Number(res.page.totalPage);
+          this.totalRowCount = Number(res.page.totalRowCount);
+        },this.errmsg());
+      },
+      //菜品分类列表
+      classifyClick(val, quickId,data) {
+        console.log(data)
+
+        this.quickId = quickId;
+        this.chupingorSelect=false;
+        //this.pagecounts=23;
+        //1的话PPR90007 0的话PPR00007 posFlag
+        let url =  "PPR00007";
+        if(data.posFlag == 1){
+            url =  'PPR90007';
+        }
+        const params = {
+          url:url,
+          data: {
+            shopSn: this.shopSn,
+            typeQuickId: this.quickId,
+            pageCount: this.pagecounts,
+            currentPageNum: val,
+            takeout:1
+          }
+        };
+        this.api.post(params, res => {
+          this.classifyList = res.page.datas;
+          this.totalPage1 = Number(res.page.totalPage);
+          this.totalRowCount1 = Number(res.page.totalRowCount);
+        },this.errmsg());
+      },
+      //快捷分类
+      classbutton(obj,data){
+        this.footItems=data;
+        if(Number(this.classify[obj].status)){
+          this.classify[obj].status=0;
+        }else{
+          for(let item of  this.classify){
+            item.status=0;
+          }
+          this.classify[obj].status=1;
+        }
+      },
+      //按钮状态
+      fyListClick(items, key) {
+             this.dangqiancaipin=items;
+        //套餐的话
+       // productId
+        if (Number(items.stock) <= 0) {
+          this.$message.error("当前菜品无！！！");
+          return
+        } else {
+          //保存时候默认一份小计为单价
+          items['fen'] = 1;
+          let itemprice=items.shopPrice;
+          if(items.ap!=null){
+            itemprice=items.ap.price;
+          }
+          items.totalPrices = itemprice;
+          items.dishStatus = 0;
+          items.status = 0;
+          items.zhekoulv=100;
+          items.isState=0;
+          if (this.greensList.length < 1) {
+            items.allfootString = ''
+          } else {
+            items.allfootString = this.greensList[0].allfootString
+          }
+          if (this.greensList.length > 0) {
+            function isInArray(arr, value) {
+              for (var i = 0; i < arr.length; i++) {
+                if (value === arr[i]['productId']) {
+                  return true;
+                }
+              }
+              return false;
+            }
+            if(items.productId.indexOf('TC')==-1){
+              this.taocan='0';
+
+              if (!isInArray(this.greensList, items.productId)) {
+                this.greensList = JSON.parse(JSON.stringify(Array.from(new Set(this.greensList).add(items))));
+                this.vuescroll()
+              }
+            }else{
+              //taocan
+              this.taocan='1';
+             /* this.dangqiancaipin.isActivityPro=1;*/
+              this.changePackage=items.productId;
+              this.$refs.diaPart.outerVisible = true;
+
+            }
+          } else {
+
+            if(items.productId.indexOf('TC')==-1){
+              this.taocan='0';
+              this.greensList = JSON.parse(JSON.stringify(Array.from(new Set(this.greensList).add(items))));
+              this.vuescroll()
+            }else{
+              //taocan
+              this.taocan='1';
+              /*this.dangqiancaipin.isActivityPro=1;*/
+              this.changePackage=items.productId;
+              this.$refs.diaPart.outerVisible = true;
+            }
+
+
+
+          }
+        }
+      },
+      diaPartCalls(data){
+         //改变当前菜品替换所选行菜品
+
+        this.currOption.opfList= JSON.parse(JSON.stringify(data));
+
+        this.greensList.splice(this.currOption.index, 1, this.currOption);
+      },
+      //套餐回调
+      diaPartCall(data){
+        console.log(data)
+        this.dangqiancaipin.opfList=[];
+
+        for(let item of data){
+          this.dangqiancaipin.opfList.push({productId:item.productId,productName:item.productName,productNum:item.proNum})
+        }
+
+        let items=this.dangqiancaipin;
+        console.log(items)
+        items['fen'] = 1;
+        let itemprice=items.shopPrice;
+        if(items.ap!=null){
+          itemprice=items.ap.price;
+        }
+        items.totalPrices = itemprice;
+        items.dishStatus = 0;
+        items.status = 0;
+        items.zhekoulv=100;
+        items.isState=0;
+        if (this.greensList.length < 1) {
+          items.allfootString = ''
+        } else {
+          items.allfootString = this.greensList[0].allfootString
+        }
+        this.greensList = JSON.parse(JSON.stringify(Array.from(new Set(this.greensList).add(items))));
+        this.vuescroll()
+      },
+      //加菜
+      ordersClick(data,call=function () {}) {
+        let _t = this,
+            opList = {opList: []},
+            gren = this.greensList,
+            len = gren.length;
+        if(len>0){
+          for(var key = 0; key < gren.length; key++){
+            let pro=gren[key].isActivityPro,
+                count=gren[key].isDiscount,
+                shifu = Number(gren[key].totalPrices || 1) * gren[key].fen*(gren[key].zhekoulv)/100;
+            //实付价格
+
+                if((gren[key].productId).indexOf('TC')!=-1){
+                  count=0;
+                  gren[key].isState='4';
+                  for(let it of gren[key].opfList){
+                    it.productNum=(gren[key].fen)*(it.productNum)
+                  }
+                  }
+
+                if(pro==1){
+                   count=0;
+                   gren[key].isState='4';
+                 }
+
+                opList.opList.push({
+                  productId: gren[key].productId,
+                  productName:gren[key].productName,
+                  lessMoney: gren[key].totalPrices,
+                  num: gren[key].fen,
+                  guiGe: gren[key].proSizeDescribe,
+                  shifuTotal: shifu,
+                  remark: gren[key].footString,
+                  dishStatus: gren[key].dishStatus,
+                  oneMoney:gren[key].totalPrices,//單價
+                  discountRate:gren[key].zhekoulv,
+                  isState:gren[key].isState,
+                  ifDis:count+'',
+                  opfList:gren[key].opfList
+                  //这个flag代表是否是特价商品的可否打折
+                 /* flag:pro*/
+                })
+          }
+          const params = {
+            url: "POS00002",
+            data: {
+              postscript: this.greensList[0].allfootString,
+              allPrice: this.notPlace,
+              orgPrice: this.notPlace,
+              orderSn: this.lineItem.orderSn,
+              shopSn: this.shopSn,
+              jsonMessage: JSON.stringify(opList),
+            }
+          };
+          this.api.post(params, res => {
+            _t.succeedList();
+            this.listpartlist[4].key=1;
+            this.listpartlist[4].val=0;
+            this.sucesslog('下单成功');
+            call.call(_t);
+            /*下单后清空当前选择菜品*/
+            this.ClearcurrItem();
+            this.printMenu(res,6)
+          },this.errmsg());
+        }else{
+          this.mseagelog('没有可下单的菜品');
+          return false
+        }
+      },
+      //下单
+      //仅仅用于下单和整单清除的回调
+      succeedList() {
+        const params = this.prmval();
+        this.api.post(params, res => {
+          console.log(res);
+          this.orderId=res.order.orderId;
+          console.log(this.orderId)
+          this.parentLineItem = res;
+          this.successedList = res.opList;
+          this.simpleLen = this.successedList.length || 0;
+          this.allprice = res.order.allprice;
+          this.discountRate = res.discountRate
+          this.empty('greensList',[]);
+          this.notPlace = 0;
+          this.orgPrice=res.order.orgPrice;
+          this.tempPrice=res.tempPrice;
+          this.kezhebukezhe(res);
+          //可打折金额和不可打折金额
+          //this.$store.commit("saveOrderId", res.opList.orderId||"")
+          this.commit("deleteFootData", {});
+          //_t.changeStatus()
+          //初始化颜色状态
+          this.changColor(this.successedList, this.greensList, 'status');
+        },this.errmsg())
+      },
+      //下单成功后重新渲染数据
+      offerClick() {
+        let xia = this.currOption.xia,
+            sel=this.selectOption(),
+            isS=Number(this.currOption.isState),
+            diof=this.$refs.diaOffer,//奉送
+            diFo=this.$refs.diaFoot,
+            funcFlag=this.funcFlagSONG,
+            ownerFlag=this.$store.state.userInfo.isShopowner
+        const params = {
+          url: "SHOP0107",//校验店员是否具有功能权限
+          data: {
+            funcFlag:funcFlag ,
+            ownerFlag: ownerFlag
+          }
+        };
+        if (sel) {
+//菜品是否选择验证
+          if (xia) {
+//是否有下单的验证
+            if ( isS!== 1 && isS!=2) {
+//有选择的菜 菜的状态
+              this.api.post(params, res => {
+//调奉验证接口，弹出窗
+//验证通过权限店长
+                 diof.outerVisible= true;
+              }, jks => {
+//验证非店长的
+                if(isS!=2) {
+//非店长的打开填写账号输入框再次验证。通过后直接完成奉送
+                  this.jurisdiction = '奉送';
+                  diFo.dialogVisible= true;
+                }
+              })
+            } else {
+//不能赠送的菜品
+             if(isS==2){
+               this.mseagelog('该商品不允许奉送')
+             }else{
+               this.mseagelog('此菜品不能执行此操作')
+             }
+            }
+          } else {
+//必须是以下单的菜品才能进行操作
+            this.mseagelog('请选择已下单商品在进行操作')
+          }
+        }
+      },
+      //奉送fun
+      footClick(msg) {
+        if (this.selectOption()) {
+          //是否有选中项
+          let _t = this;
+          let xia = this.currOption.xia;
+          let index = this.currOption.index;
+          if (xia) {
+            //是否有以下单的
+            if (this.currOption.isState == 1) {
+              this.$message.error('该菜品不能退换');
+              //是否可退菜
+            } else {
+              const params = {
+                url: "SHOP0107",
+                data: {
+                  funcFlag: this.funcFlagtui,
+                  ownerFlag: this.userInfo.isShopowner
+                }
+              };
+              //是否权限
+              this.api.post(params, res => {
+                const params = {
+                  url: 'OR900209',
+                  data: {
+                    id: this.currOption.id,
+                    isState: '1'
+                  }
+                };
+                this.api.post(params, res => {
+                  _t.footSuc();
+                  this.ClearcurrItem();
+                })
+              }, jks => {
+                //退菜
+                this.jurisdiction = '退菜';
+                this.$refs.diaFoot.dialogVisible=true;
+              })
+            }
+          } else {
+            //未下单的 //退菜
+            this.greensList.splice(index, 1);
+            //退菜以后的清空当前菜品
+            this.ClearcurrItem();
+           // this.currOption = {};
+          }
+        }
+      },
+      //退菜
+      footSuc() {
+          const params = this.prmval();
+          this.api.post(params, res => {
+          this.parentLineItem = res;
+          this.successedList = res.opList;
+          this.simpleLen = this.successedList.length || 0;
+          this.allprice = res.order.allprice;
+          this.orgPrice=res.order.orgPrice;
+          this.tempPrice=res.tempPrice;
+          this.kezhebukezhe(res)
+        },this.errmsg());
+      },
+      //退菜状态后的返现
+      nameClick(){
+        if (this.selectOption()) {
+          let newname = this.currOption;
+          let {xia} = newname;
+          if (!xia) {
+            if (this.currOption['isSaleProduct'] != 2) {
+              this.mseagelog("该菜品不能修改菜名");
+              return;
+            } else {
+              this.$refs.diaName.outerVisible = true;
+            }
+          } else {
+            this.mseagelog("该菜品不能修改菜名");
+            return;
+          }
+        }
+      },
+      //修改菜目
+      remarkClick() {
+        let xia = this.currOption.xia,
+          len = this.greensList.length,
+          footString = this.currOption.footString || '',
+          productId = this.currOption.productId,
+
+          newdata = {
+            footString: footString ,
+            productobj: [],
+            productId: productId
+          };
+        if (xia !== undefined) {
+          if (!xia) {
+            if (len < 1) {
+              this.mseagelog("请选择一条未下单的菜品");
+            } else {
+              //单品服务
+              this.remarkName = "单品备注";
+              this.$store.commit("saveMenuid", newdata);
+
+              this.$refs.diaRemark.dialogVisible = true;
+
+            }
+          } else {
+            this.mseagelog("请选择一条未下单的菜品");
+          }
+        } else {
+          this.mseagelog("请选择一条未下单的菜品");
+        }
+      },
+      //单品备注
+      wRemarkClick() {
+        if (this.greensList.length < 1) {
+          this.mseagelog("未下单的菜品才能进行备注");
+          return false
+        } else {
+          //全单备注
+          this.remarkName = '整单备注';
+          this.$refs.diaRemark.dialogVisible = true;
+          //全单备注只在单品里判断是否是下单的能不能备注全单不需要
+        }
+      },
+      //整单备注
+      changwRemark(nodes, nodeitem, val) {
+        if (nodes.length > 0) {
+          for (let item of nodes) {
+            this.$set(item, nodeitem, val);
+          }
+        }
+        this.add()
+      },
+      //备注后响应
+      hurryClick() {
+        if (this.selectOption()) {
+          let xia = this.currOption.xia;
+          if (xia) {
+            if (this.currOption.dishStatus != 1 && this.currOption.isState != 1) {
+              this.$refs.diaHurry.dialogVisible = true;
+            } else {
+              this.mseagelog("该菜品不能执行此操作");
+            }
+          } else {
+            this.mseagelog("请选择已下单商品在进行操作");
+            return;
+          }
+        }
+      },
+      //催菜
+      dishesClick() {
+            let suc=this.successedList,
+                len =suc.length;
+        if (len> 0) {
+          let waiterdis=this.waiterdis();
+          let waiterGreen=this.waiterGreen();
+          if(waiterdis && !waiterGreen){
+            this.$refs.disDishes.dialogVisible = true;
+            this.disheskName = "起菜";
+            this.portType = "2";
+            this.inpName = "整单起菜";
+            if (JSON.stringify(this.currOption) == '{}') {
+              this.inpConName = false;
+            } else {
+              this.inpConName = "单品起菜";
+            }
+          }else{
+            if(this.waiterGreen()){
+              this.mseagelog("请在下单后进行起菜");
+              return
+            }
+              this.mseagelog("没有等叫的菜品");
+          }
+        } else {
+          if(len<1 &&  this.waiterGreen()){
+            this.mseagelog("请在下单后进行起菜");
+          }else{
+            this.mseagelog("没有等叫的菜品");
+          }
+        }
+      },
+      //起菜
+      waiterdis(){
+        let suc=this.successedList;
+        for(let item of suc){
+          if(item.dishStatus==1){
+            return true
+          }
+        }
+        return false
+      },
+      //是否有等叫的菜
+      waiterGreen(){
+        let gre=this.greensList;
+        for(let item of gre){
+          if(item.dishStatus==1){
+            return true
+          }
+        }
+        return false
+      },
+      calledClick() {
+        if (this.greensList.length > 0) {
+          this.$refs.disDishes.dialogVisible = true;
+          this.disheskName = "等叫";
+          this.portType = "1";
+          this.inpName = "整单等叫";
+          if (JSON.stringify(this.currOption) == '{}') {
+            this.inpConName = false;
+          } else {
+            this.inpConName = '单品等叫';
+          }
+        } else {
+          this.mseagelog('请选择未下单的商品进行操作')
+          // this.$message.error('添加未下单的菜品');
+        }
+      },
+      //等叫
+      discountClick() {
+        if (this.selectOption()) {
+          let xia = this.currOption.xia;
+          //  this.$refs.diaHurry.dialogVisible = true;
+          if (xia) {
+            // this.$refs.disCount.dialogVisible = true;
+            //打折的权限
+            if (this.currOption.ifDis == 1 && this.currOption.isState !=1) {
+              const params = {
+                url: "SHOP0107",
+                data: {
+                  funcFlag: this.funonlyflod,
+                  ownerFlag: this.$store.state.userInfo.isShopowner
+                }
+              };
+              this.api.post(params, res => {
+             //   console.log('可以单品打折后出现');
+                this.$refs.disCount.dialogVisible = true;
+              }, jks => {
+
+                this.jurisdiction = '单品打折';
+                this.$refs.diaFoot.dialogVisible = true;
+              })
+
+            } else {
+              if(this.currOption.isState == 1){
+                this.mseagelog("已退菜品不能打折");
+              }
+              else {
+                this.mseagelog("请选择能打折的商品");
+              }
+              // this.$message.error("请选择非等叫的或以退的菜品进行操作");
+            }
+          } else {
+            this.mseagelog("请选择已下单菜品进行操作");
+            // this.$message.error("请选择已下单商品在进行操作");
+            return;
+          }
+        }
+      },
+      //单品打折
+      screenClick() {
+        if( this.touchTitle == "分类点餐"){
+          for(let item of this.classify){
+            item.status=0
+          }
+          this.touchTitle = "触屏点餐";
+          this.morenval=1;
+          this.redlistyleval=0;
+        }else{
+          this.seachFoot('');
+          for(let item of this.classify){
+            item.status=0
+          }
+          this.morenval=0;
+          this.redlistyleval=1;
+          this.touchTitle = "分类点餐";
+        }
+
+        if(this.visible){
+          this.visible=false;
+          this.classifyList=[];
+          this.pagecounts=23;
+        }else{
+          this.visible=true;
+          this.classifyList=[];
+          this.pagecounts=28;
+        }
+      },
+      //触屏切换
+      seachFoot(val) {
+        const params = {
+          url: "PPR00007",
+          data: {
+            shopSn: this.shopSn,
+            zjf: this.searchDish.trim(),
+            currentPageNum:val,
+            pageCount:this.pagecounts,
+            takeout:1
+          }
+        };
+        this.api.post(params, res => {
+          this.totalRowCount1 = Number(res.page.totalRowCount);
+          this.classifyList=res.page.datas;
+          if (res.page.datas.length == 0) {
+            this.$message.error('没搜索到相关菜品！！！')
+          }
+        },this.errmsg());
+      },
+      //搜索菜品
+      modifyClick() {
+          this.$refs.disModify.outerVisible = this.modify;
+      },
+      //修改人数
+      messageClick() {
+        this.$refs.disMessage.outerVisible = true;
+      },
+      //客人留言
+      canselClick() {
+          const params = {
+            url: "SHOP0107",
+            data: {
+              funcFlag: this.funcFlagall,
+              ownerFlag: this.userInfo.isShopowner
+            }
+          };
+          this.api.post(params, res => {
+            this.$refs.disCancel.dialogVisible = true;
+          }, jks => {
+            this.jurisdiction = '整单取消';
+            this.$refs.diaFoot.dialogVisible = true;
+          })
+      },
+      // 调用打印的API
+      // 0-默认  1-等叫 2-单品起菜 3-催菜 预打账单-4 打印点菜单-5 下单-6  整单起菜-7
+      printMenu(printData,num){
+        printData.orderTypeF = num || 5
+        console.log(printData,num)
+        let _t = this;
+        let msg = this.$notify.info({
+          title: '提示',
+          message: '正在打印小票，请稍后...',
+          duration: 0,
+          showClose: false
+        });
+        if(typeof API === 'undefined'){
+           setTimeout(() => {
+                msg.close();
+                _t.$notify.error({
+                  title: '错误',
+                  showClose:false,
+                  message: '打印失败',
+                  duration:2000
+                });
+            },1000);
+          }else{
+            API.printOrder(JSON.stringify(printData));
+            msg.close()
+          }
+      },
+      // 获取打印数据
+      getPrintData(num){
+        const params = {
+          url: 'OJ910106',
+          data: {
+            orderSn: this.lineItem.orderSn
+          }
+        };
+        this.api.post(params, res => {
+          console.log(res)
+          this.printMenu(res.obj,num)
+        })
+      },
+      //整单取消
+      waiterClick() {
+        this.$refs.disWaiter.outerVisible = true;
+      },
+      //修改服务员
+      countClick() {
+        let suc = this.successedList.length,
+            dis =  this.$refs.disDiscount,
+            dia = this.$refs.diaFoot,
+            params = {
+              url: "SHOP0107",
+              data: {
+                funcFlag: this.funcallflod,
+                ownerFlag:this.userInfo.isShopowner
+              }
+            },
+          gren = this.greensList,
+          len = gren.length;
+
+        if(suc > 0) {
+          this.api.post(params, res => {
+            if(len > 0){
+              this.$refs.dishess.dialogVisible = true;
+              //清空或者下单弹窗
+            }else{
+              dis.outerVisible = true;
+            }
+          }, jks => {
+
+              this.jurisdiction = '打折';
+              dia.dialogVisible = true;
+          })
+        }else{
+          this.mseagelog('没有下单菜品')
+        }
+
+      },
+      //打折
+      menuClick() {
+
+        let deskNo=this.lineItem.deskNo,
+          orderSn = this.lineItem.orderSn,
+          query = {deskNo:deskNo,orderSn:orderSn,id:this.$route.query.id},
+          path = 'menuPayment',
+          num = 0,
+          mutation = "saveaobutton";
+        this.$router.push({path: path, query:query});
+        this.$store.commit(mutation,num);
+      },
+      //付款
+      newLeaguerClick() {
+
+        this.$refs.disMemberentry.dialogVisible = true;
+      },
+      handleCurrentChange(val) {
+        this.dishesList(val);
+      },
+      handleCurrentChange1(val) {
+        if(this.chupingorSelect){
+          this.seachFoot(val,this.quickId,this.footItems)
+        }else{
+          this.classifyClick(val, this.quickId,this.footItems);
+        }
+      },
+      hasClass( elements,cName ){
+    return !!elements.className.match( new RegExp( "(\\s|^)" + cName + "(\\s|$)") ); // ( \\s|^ ) 判断前面是否有空格 （\\s | $ ）判断后面是否有空格 两个感叹号为转换为布尔值 以方便做判断
+     },
+      addClass( elements,cName ){
+    if( !this.hasClass( elements,cName ) ){
+     // elements.className += " " + cName;
+      elements.className =cName;
+    };
+  },
+      removeClass( elements,cName ){
+    if( this.hasClass( elements,cName ) ){
+      elements.className = elements.className.replace( new RegExp( "(\\s|^)" + cName + "(\\s|$)" )," " ); // replace方法是替换
+    };
+   },
+      yichuleft(){
+        for(let i=0;i<this.$refs.leftlist.children.length;i++){
+          this.removeClass( this.$refs.leftlist.children[i],'listyle' )
+        }
+          this.removeClass( this.$refs.leftlist.children[this.$refs.leftlist.children.length-1],'redlistyle' )
+      },
+      leftcolor(index){
+        //颜色状态
+        let _t=this;
+        let leftlists=this.$refs.leftlist.children;
+        let child = leftlists[index];
+        let calssStr='listyle';
+        this.addClass( child,calssStr );
+            window.setTimeout(function () {
+              _t.removeClass( child,calssStr )
+            },_t.calssTime)
+      },
+      listport(index,callback){
+         let _t=this;
+             _t.bluslist.splice(index,1,{key:0,val:1});
+             callback && callback();
+             window.setTimeout(
+               function () {
+                 let initlist=JSON.parse(JSON.stringify(_t.bluslistre));
+                 _t.bluslist=initlist;
+             },this.calssTime);
+      },
+      dialogCue(val){
+        //等叫
+        if(val==0){
+          this.calledClick();
+        }else if(val == 1){
+          //下单
+          this.ordersClick(val,function () {
+            this.$refs.diaCue.dialogVisible = false;
+           // dis.outerVisible = true;
+          });
+        }else{
+          const params = {
+            url:'TB000016',
+            data:{
+              id:this.$route.query.id
+            }
+          };
+          this.api.post(params,(res)=>{
+            this.$router.push({path:"/content/found"});
+          })
+        }
+        //discountClick
+      },
+      ynFeidengjiao(data){
+        for(let item of data){
+          if(item.dishStatus==1){
+            return true
+          }
+          return false
+        }
+      },
+      escClick(){
+      //  this.$router.push({path:"/content/found"});
+        const params = {
+          url:'TB000016',
+          data:{
+            id:this.$route.query.id
+          }
+        };
+       // if(this.greensList){}
+          if(this.greensList.length && !this.successedList.length ){
+              if(!this.ynFeidengjiao(this.greensList)){
+                this.$refs.diaCue.dialogVisible = true;
+              }else{
+                window.history.back(-1)
+              }
+
+          }else if(!this.successedList.length && !this.greensList.length){
+            this.api.post(params,(res)=>{
+              this.$router.push({path:"/content/found"});
+            })
+          }else{
+              window.history.back(-1)
+          }
+      },
+      changColor(nodes = [], nodes2 = [], nodeitem, val = 0) {
+        if (nodes.length > 0) {
+          for (let item of nodes) {
+            item[nodeitem] = val
+          }
+        }
+        if (nodes2.length > 0) {
+          for (let item of nodes2) {
+            item[nodeitem] = val
+          }
+        }
+      },
+      //优惠券回调
+      youhuiquanCall(){
+        this.succeedList()
+      },
+      vuescroll() {
+        this.menuScroll.refresh();
+        this.menuScroll.scrollTo(0, this.menuScroll.maxScrollY, 2000)
+      },
+      changeStatus(items) {
+        let status = items.isState;
+        let dishStatus = items.dishStatus;
+
+        if (status == "0") {
+          if (dishStatus == "0") {
+            return ""
+          } else if (dishStatus == "1") {
+            return "等"
+          } else if (dishStatus == "2") {
+            return "起"
+          } else {
+            return "催"
+          }
+          ;
+          return
+        }
+        if (status == "1") {
+          return "退"
+        }
+        if (status == "2") {
+          return "送"
+        }
+        if (status == "3") {
+          return "折"
+        }
+        if (status == "4") {
+          console.log(items.productId.indexOf('TC'))
+          if(items.productId.indexOf('TC')==-1){
+            return "特"
+          }
+        }
+      },
+      //退送折
+      orderNumber(index) {
+        let indexNum = index;
+        let x = "";
+        let ccc = Object.keys(this.greensList).findIndex(x => x == indexNum);
+        return this.simpleLen + ccc + 1
+      },
+      //序号
+      //label menuList
+      refResh(){
+        const params = {
+          url: "POS00010",
+          data: {
+            tableOrder: this.publicval
+          }
+        };
+        this.api.post(params, res => {
+          this.zheRang=res.zheRang;
+          this.discountRate=res.discountRate;
+          this.parentLineItem = res;
+          this.successedList = res.opList;
+          this.simpleLen = this.successedList.length || 0;
+          this.allprice = res.order.allprice;
+          this.kezhebukezhe(res);
+        })
+
+      },
+      qingchuhouPrent(params){
+          this.api.post(params, res => {
+            this.$store.commit("saveRefreshMenu",true);
+            this.sucesslog('打折成功');
+            this.$refs.dishess.dialogVisible = false;
+          })
+      },
+      kezhebukezhe(data){
+        this.kezheval=data.discountTotal;
+        this.bukezheval=data.unDiscountTotal;
+        this.flag=data.flag;
+      },
+      buttonrest(key){
+        this.listpartlist[key].key=1;
+        this.listpartlist[key].val=0;
+      },
+      //componentsCall
+      diaHurryCall(data) {
+        console.log(data)
+        const params = {
+          url: "POS00010",
+          data: {
+            tableOrder: this.publicval
+          }
+        };
+        this.api.post(params, res => {
+          this.zheRang=res.zheRang
+          this.discountRate=res.discountRate
+          this.parentLineItem = res;
+          this.successedList = res.opList;
+          this.simpleLen = this.successedList.length || 0;
+          this.allprice = res.order.allprice;
+          this.printMenu(data,3)
+        },this.errmsg())
+      },
+      diaFootCall(msg){
+        if (msg == 'ok') {
+          const params = {
+            url: 'OR900209',
+            data: {
+              id: this.currOption.id,
+              isState: '1'
+            }
+          };
+          this.api.post(params, res => {
+            this.footSuc();
+            this.ClearcurrItem();
+          })
+        }
+        this.$refs.diaFoot.dialogVisible=false
+      },
+      diaFootCallzhe(){
+        let  gren = this.greensList,
+             len = gren.length;
+        if(len>0){
+          this.$refs.dishess.dialogVisible = true;
+        }else{
+          this.$store.commit("saveWholefold",true);
+        }
+      },
+      diaLogCall(x){
+        this.currOption.isState = 2
+      },
+      diaNameCall(msg) {
+            let newname = this.currOption;
+            let index = newname.index;
+            if(msg.trim()!=''){
+              newname.productName = msg;
+            }else{
+              newname.productName=newname.productName
+            }
+            this.greensList.splice(index, 1, newname);
+      },
+      diaRemarkCall(){
+        this.vuescroll()
+      },
+      diaDiscountCall(msg){
+        this.$refs.dishess.dialogVisible = true;
+        this.zhekoujia=msg;
+      },
+      diaDishessCall(msg){
+        let dis =  this.$refs.disDiscount;
+        if(msg==1){
+          this.ordersClick(msg,function () {
+            this.$refs.dishess.dialogVisible = false;
+            dis.outerVisible = true;
+          });
+        }
+        else if(msg==0)
+        {
+          this.empty('greensList',[]);
+          this.$refs.dishess.dialogVisible = false;
+          dis.outerVisible = true;
+        }
+
+      },
+      diaWaiterCall() {
+        const params = {
+          url: "POS00010",
+          data: {
+            tableOrder: this.publicval
+          }
+        };
+        this.api.post(params, res => {
+          this.zheRang=res.zheRang
+          this.discountRate=res.discountRate
+          this.lineItem = res.preEntity;
+        },this.errmsg())
+      },
+      disModifyCall(msg){
+        if(msg<0){
+          msg=0
+        }
+        console.log(msg)
+        this.lineItem.person = msg;
+
+      },
+      diaMessageCall(){
+
+      },
+      diaDiscountsCall(msg,val){
+        this.currOption.discountRate=msg||100;
+        let index= this.currOption.index;
+        if(msg!=100){
+          this.currOption.isState=3
+        }else{
+          this.currOption.isState=0
+        }
+        //this.currOption.isState=3;
+        this.successedList.splice(index, 1, this.currOption);
+        this.add();
+        let i=1;
+         i++;
+        this.$store.commit("saveRefreshMenu",i);
+      },
+      diawaiterCall(){
+        this.$refs.diaCue.dialogVisible = false;
+      },
+      diaqicaisuCall(data,type){
+        console.log(type)
+        const params = {
+          url: "POS00010",
+          data: {
+            tableOrder: this.publicval
+          }
+        };
+        this.api.post(params, res => {
+          this.zheRang=res.zheRang;
+          this.discountRate=res.discountRate;
+          this.currOption.dishStatus=2;
+          this.parentLineItem = res;
+          this.successedList = res.opList;
+          this.simpleLen = this.successedList.length || 0;
+          this.allprice = res.order.allprice;
+          this.orgPrice=res.order.orgPrice;
+          this.tempPrice=res.tempPrice;
+          this.kezhebukezhe(res)
+          this.printMenu(data,type)
+        },this.errmsg());
+      },
+      diaCancelCall(){
+        this.buttonrest(7);
+        // console.log('整单取消成功回调')
+      },
+      //调用子组件结束
+      show(e) {
+        this.input = e.target;
+      },
+      // 软键盘操作函数
+      //Scrap废弃
+      currOptionUpdata(val){
+        this.currOption=val
+      },
+      changColorchushihua(nodes = [], nodes2 = [], nodeitem, val = 0) {
+        // console.log(nodes)
+        if (nodes == null) {
+          nodes = [];
+        }
+        if (nodes.length > 0) {
+          for (let item of nodes) {
+            // console.log(val)
+            item[nodeitem] = item[nodeitem];
+          }
+        }
+        if (nodes2.length > 0) {
+          for (let item of nodes2) {
+            item[nodeitem] = item[nodeitem];
+          }
+        }
+      },
+      dazheApi(codema){
+        if(codema.key==0){
+          const params = {
+            url: "POS00004",
+            data: codema.val
+          };
+          this.qingchuhouPrent(params);
+          //0为整单
+        }else if(codema.key==1){
+          const params = {
+            url: "POS00005",
+            data: codema.val
+          };
+          //1为固定
+          this.qingchuhouPrent(params);
+        }
+      }
+      //颜色
+    }/*,
+    filters: {
+      formatDate(time) {
+        var date = new Date(time);
+        return formatDate(date, 'yyyy-MM-dd hh:mm);
+      }
+    }*/,
+    computed: {
+      //应付，实付 金额
+      handleMoney() {
+        //整单价格
+        this.dazheobjval={
+          num:this.orgPrice,
+          pricenum:this.lineItem,
+          orderSn:this.lineItem.orderSn,
+          Discount:this.discountRate,
+          zheRang:this.zheRang,
+          tempPrice:this.tempPrice
+        };
+     //   debugger
+        return  this.allprice
+      },
+      zhengdanfu(){
+       /* return   Math.floor((this.orgPrice+this.notPlace)*100)/100*/
+         return this.orgPrice
+      },
+      count() {
+        return this.$store.state.menuid
+      },
+      allSlote() {
+        return this.$store.state.allSlote
+      },
+      //奉送
+      modiFyname() {
+        return this.$store.state.modiFyname
+      },
+      //全单取消
+      wholeSingleCancel() {
+        return this.$store.state.wholeSingleCancel
+      },
+      returnDishes() {
+        return this.$store.state.returnDishes
+      },
+      refreshMenu() {
+        return this.$store.state.refreshMenu
+      },
+      //打折
+      wholefold(){
+        return this.$store.state.wholefold
+      },
+      //单品打折
+      itemonSale(){
+        return this.$store.state.itemonSale
+      },
+      /*quxiaobutton(){
+        //取消操作后按钮的状态控制器
+        return this.$store.state.quxiaobutton
+      }*/
+    },
+    watch: {
+     /* quxiaobutton(){
+
+      },
+      'lineItem.operName':{
+
+        handler(curVal,oldVal){
+
+        },
+        deep:true
+      },
+      'lineItem.person':{
+
+        handler(curVal,oldVal){
+
+        },
+        deep:true
+      },*/
+      itemonSale(){
+        this.$refs.disCount.dialogVisible =this.itemonSale ;
+      },
+      successedList(){
+
+        for(let i=0;i<this.$refs.leftlist.children.length;i++){
+          this.removeClass( this.$refs.leftlist.children[i],'listyle' )
+        }
+      },
+      //保存当前选项状态
+      currOption(newval,oldval){
+        if(newval.xia){
+          this.weixiadanindex=undefined;
+          this.succindex= newval.index;
+        //  console.log( newval.index+'选中下标')
+        }else{
+
+          this.succindex=undefined;
+          this.weixiadanindex= newval.index;
+        }
+      },
+      greensList(newval, oldval) {
+        //某号
+        let tabeleOrder = this.$route.query.tableOrder;
+        //保存
+        this.add();
+        //获取
+        let liststat = this.$store.state.greensList[tabeleOrder];
+        //同步
+        this.greensList = liststat;
+        //总价应付和实
+        //未下单
+        let notPlace = 0;
+         //擦这里重置了notplace导致我以为不会发生响应，因为数组改变以后就会走这里
+
+        for (let price of newval) {
+          //价格乘以折扣率
+          notPlace += Number(price['totalPrices']) * price['fen']*((price['zhekoulv']||100)/100)
+        }
+
+        //this.notjiajian本地总价加减值
+        this.notPlace = notPlace;
+        //退菜退到没菜了因为最后一次退菜还要选中去退所以要清空当前选项
+        if (this.greensList.length < 1) {
+          this.ClearcurrItem();
+          //this.currOption = {};
+        }
+        //关于notplace值得操作要从这里开始
+        for(let i=0;i<this.$refs.leftlist.children.length;i++){
+          this.removeClass( this.$refs.leftlist.children[i],'listyle' )
+        }
+        this.$store.commit("saveRefreshMenu",0)
+      },
+      count() {
+        //单品备注
+        let index = this.currOption.index;
+        let str = this.$store.state.menuid.footString || '';
+        this.currOption.footString = str;
+        this.greensList.splice(index, 1, this.currOption);
+      },
+      allSlote() {
+        //整单备注
+        let str = this.$store.state.allSlote.allfootString.join();
+
+        this.changwRemark(this.greensList, 'allfootString', str);
+      },
+      //根据权限调用对应组件
+      modiFyname() {
+        //奉送
+        this.$refs.diaOffer.outerVisible = this.modiFyname
+      },
+      wholeSingleCancel() {
+        //整单取消
+        this.$refs.disCancel.dialogVisible = this.wholeSingleCancel;
+
+      },
+      returnDishes() {
+        //退菜
+        this.$refs.disCancel.dialogVisible = this.returnDishes;
+      },
+      refreshMenu() {
+        if (this.refreshMenu) {
+          this.refResh();
+          this.$store.commit("saveRefreshMenu", false);
+        }
+      },
+      searchDish(){
+        this.chupingorSelect=true;
+        this.seachFoot(1);
+      },
+      //打折
+      wholefold(){
+
+        this.$refs.disDiscount.outerVisible = this.wholefold;
+
+      },
+      publicval(){
+
+        let allSlote={
+            allfootString:[],
+            productobj:[]
+          };
+        this.$store.commit('saveCuisineList',allSlote);
+      }
+    }
+  };
+
+</script>
+<style lang="scss">
+
+  .active {
+    background-color: #1bbc9b;
+    span {
+      color: #ffffff;
+    }
+  }
+
+  .searchDish {
+    width: 100%;
+    height: 27px;
+    background: #ffffff;
+    border: 1px solid #dee0e7;
+    border-radius: 4px;
+    font-size: 16px;
+    color: #2d2d2d;
+    padding-left: 20px;
+    /*margin: 10px 0;*/
+    outline: none;
+  }
+  .activeSearchList{
+    margin: 7.8px 5px !important;
+  }
+  .orderSystem {
+    display: flex;
+    height: 100%;
+    background: #2c2c2c;
+    flex-direction: row;
+    ul,
+    li,
+    ol {
+      list-style: none;
+    }
+    // 左侧
+    .sysNav {
+      height: 100%;
+      width: 90px;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      li {
+        width: 100%;
+        background-image: linear-gradient(-90deg, #3adfcb 0%, #1bbc9b 100%);
+        height: 60px;
+        margin: 0 auto;
+        margin-bottom: 2px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        span {
+          font-family: MicrosoftYaHei;
+          font-size: 14px;
+          color: #ffffff;
+          letter-spacing: 0;
+          line-height: 18px;
+          text-align: center;
+        }
+      }
+      .redlistyle{
+        background: #ea5414;
+      }
+
+      .listyle{
+        background:#1bbc9b ;
+        background-image:inherit;
+      }
+      .moren{
+        margin-bottom: 0;
+        background-image: linear-gradient(-269deg, #ea5414 0%, #ff8f5f 100%);
+      }
+    }
+    //中间部分
+    .sysBill {
+      width: 320px;
+      height: 100%;
+      padding: 20px 10px;
+      margin-right: 10px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      .billHaed {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 0 10px;
+        span {
+          font-family: MicrosoftYaHei;
+          font-size: 14px;
+          color: #989898;
+          letter-spacing: 0;
+        }
+      }
+      .billWaiter {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 10px;
+        margin-top: 10px;
+        margin-bottom: 20px;
+        span {
+          font-family: MicrosoftYaHei;
+          font-size: 14px;
+          color: #2d2d2d;
+          letter-spacing: 0;
+          text-align: left;
+        }
+        .tableNum {
+          margin: 0 50px 0 30px;
+        }
+      }
+      .billTitle {
+        height: 26px;
+        display: flex;
+        line-height: 26px;
+        border-top: 1px solid #efefef;
+        border-bottom: 1px solid #efefef;
+        li {
+          font-family: MicrosoftYaHei;
+          font-size: 12px;
+          text-align: center;
+          color: #989898;
+          letter-spacing: 0;
+        }
+        li:nth-child(1) {
+          width: 20px;
+        }
+        li:nth-child(2) {
+          width: 50px;
+        }
+        li:nth-child(3) {
+          width: 70px;
+        }
+        li:nth-child(4) {
+          width: 40px;
+        }
+        li:nth-child(5) {
+          width: 25px;
+        }
+        li:nth-child(7) {
+          width: 25px;
+        }
+        li:nth-child(6) {
+          width: 60px;
+        }
+      }
+      .billDetailList::-webkit-scrollbar {
+        width: 5px;
+
+      }
+      .calculatorBox {
+        background: #1d1d1d;
+        border-radius: 4px;
+        width: 303px;
+        .calculator {
+          height: 201px;
+          .outputRight {
+            height: 201px;
+          }
+
+          .outputLeft {
+            width: 75%;
+          }
+        }
+
+      }
+      .billDetailList {
+        width: 100%;
+        //display: flex;
+        //align-items: center;
+        // flex-direction: column;
+        //justify-content: flex-start;
+        ///overflow: auto;
+        //overflow-y: scroll;
+        //border-bottom: 1px solid #efefef;
+        li {
+          width: 100%;
+          min-height: 48px;
+          padding: 6px 0;
+          display: flex;
+          align-items: center;
+          flex-wrap: wrap;
+          padding-right: 9px;
+          & > * {
+            flex: none;
+          }
+          p:nth-child(1) {
+            margin-left: 15px;
+          }
+          span {
+            display: block;
+            text-align: center;
+            font-size: 12px;
+            color: #2d2d2d;
+          }
+          span:nth-child(1) {
+            margin-left: 25px;
+          }
+          span:nth-child(2) {
+            width: 48px;
+          }
+          span:nth-child(3) {
+            width: 70px;
+          }
+          span:nth-child(4) {
+            min-width: 40px;
+          }
+          span:nth-child(5) {
+            width: 25px;
+          }
+          span:nth-child(6) {
+            width: 57px;
+          }
+          span:nth-child(7) {
+            width: 57px;
+          }
+          .ditch {
+            display: inline-block;
+            width: 7px;
+            height: 3px;
+            background: #1bbc9b;
+            line-height: 0;
+            font-size: 0;
+            vertical-align: middle;
+            transform: rotate(45deg);
+          }
+          .ditchs {
+            display: inline-block;
+            width: 7px;
+            height: 3px;
+
+            line-height: 0;
+            font-size: 0;
+            vertical-align: middle;
+            transform: rotate(45deg);
+          }
+
+          .ditch:after {
+            content: "/";
+            display: block;
+            width: 9px;
+            height: 3px;
+            background: #1bbc9b;
+            transform: rotate(-90deg) translateY(44%) translateX(34%);
+          }
+          .emptyP {
+            display: inline-block;
+            padding-left: 7px;
+            line-height: 0;
+            font-size: 0;
+            vertical-align: middle;
+            transform: rotate(45deg);
+          }
+          .stateShow {
+            margin-left: 9px;
+            font-size: 12px;
+            color: #ea5414;
+          }
+        }
+        div {
+          width: 300px;
+          /*overflow: hidden;*/
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          padding-left: 75px;
+          font-size: 12px;
+          color: #989898;
+          text-align: left;
+        }
+        // li:hover span {
+        //   color: #fff;
+        // }
+        // li:hover {
+        //   background-color: #1bbc9b;
+        // }
+        // li:hover .ditch {
+        //   background-color: #ffffff;
+        // }
+        // li:hover .ditch:after {
+        //   background-color: #ffffff;
+        // }
+      }
+      .billBorder {
+        margin-left: 10px;
+        margin-top: 8px;
+        width: 280px;
+        height: 1px;
+        background: #efefef;
+        bottom: 0;
+      }
+      .totalMoney {
+        height: 54px;
+        line-height: 54px;
+        padding: 0 20px;
+        span:first-child {
+          margin-right: 10px;
+        }
+        span {
+          font-size: 14px;
+          color: #2d2d2d;
+        }
+      }
+      .waveImg {
+        height: 23px;
+        background: #ccc url(../../assets/images/Rectangle@1x.png) repeat-x;
+        background-size: 18px 8px;
+        //box-shadow:-1px 2px 12px 0 rgba(0,0,0,0.50);
+        opacity: 0.34;
+      }
+    }
+    //右侧
+    .sysMain {
+      height: 100%;
+      background: #ffffff;
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      .search-dish{
+        margin-top: 15px;
+        background:#ffffff;
+        width:100%;
+        height:50px;
+        padding: 10px 13px 10px 22px;
+        display: none;
+        div{
+          background:#ffffff;
+          border:1px solid #efefef;
+          width:100%;
+          height:30px;
+          display: flex;
+          line-height: 28px;
+          .searchLogo{
+            margin:6px 15px 20px;
+            width: 16px;
+            height: 16px;
+            background:#fff url(../../assets/images/search.png) center no-repeat;
+          }
+          input{
+            width: 90%;
+            outline: none;
+            border: none;
+          }
+        }
+      }
+      .activeSearch{
+        display: block;
+      }
+
+      .footList {
+        height: 154px;
+        display: flex;
+        padding: 20px 22px;
+
+        .footOrder {
+          height: 100%;
+          //width: 456px;
+          display: flex;
+
+          flex: 1;
+          //align-items: center;
+          flex-wrap: wrap;
+          .sameOrder {
+            background-image: linear-gradient(-179deg, #3adfcb 0%, #1bbc9b 100%);
+            border-radius: 4px;
+            //width: 104px;
+            height: 52px;
+            line-height: 52px;
+            text-align: center;
+            color: #ffffff;
+            // margin-right: 10px;
+          }
+          .checkedItemstyle{
+            background:#1bbc9b ;
+            background-image:inherit;
+          }
+          .activeBg {
+            background: pink;
+          }
+        }
+        .footPage {
+          height: 100%;
+          width: 104px;
+          padding-left: 10px;
+          //display: flex;
+          //flex-direction: column;
+          //justify-content: space-between;
+          // div {
+          //   background-image: linear-gradient(-179deg, #3adfcb 0%, #1bbc9b 100%);
+          //   border-radius: 4px;
+          //   width: 104px;
+          //   height: 52px;
+          // }
+          .el-pagination {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            .btn-prev, .btn-next {
+              background: linear-gradient(180deg, #3adfcb 0%, #1bbc9b 180%);
+              border-radius: 4px;
+              width: 104px;
+              height: 52px;
+              .el-icon {
+                font-size: 22px;
+                color: #fff;
+                font-weight: bold;
+              }
+            }
+            .btn-prev {
+              margin-bottom: 5px;
+              .el-icon {
+                transform: rotate(90deg);
+              }
+            }
+            .btn-next {
+              padding-left: 0px;
+              .el-icon {
+                transform: rotate(90deg);
+              }
+            }
+          }
+          .upPage {
+            background: #1bbc9b url(../../assets/images/Fill201@1xup.png) no-repeat center center;
+          }
+          .downPage {
+            background: #e6e6e6 url(../../assets/images/Fill201@1xdow.png) no-repeat center center;
+          }
+        }
+      }
+      .touchKeyShow {
+        width: 100%;
+        height: 0;
+        .vue-touch-keyboard .keyboard .key {
+          height: 2rem;
+          line-height: 2rem;
+        }
+        .vue-touch-keyboard {
+          width: 100%;
+          height: 240px;
+          position: static;
+        }
+      }
+      .mainList {
+        width: 100%;
+        padding: 12px 17px 20px 17px;
+        height: 361px;
+        background: #eefaf8;
+        display: flex;
+        flex: 1;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        align-content: flex-start;
+        position: relative;
+        .footsListScroll {
+          display: flex;
+          flex-wrap: wrap;
+          align-content: flex-start;
+          .productSyn {
+            position: relative;
+            background: #ffffff;
+            box-shadow: 0 2px 2px 0 rgba(5, 147, 113, 0.1);
+            border-radius: 4px;
+            width: 104px;
+            height: 58px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 5px;
+            padding: 6px;
+            p {
+              font-family: MicrosoftYaHei;
+              font-size: 12px;
+            }
+            div {
+
+              text-align: center;
+              height: 60px;
+              p {
+                font-size: 12px;
+                display: inline-block;
+                text-align: left;
+                color: #2d2d2d;
+              }
+            }
+            p {
+              align-self: flex-end;
+              font-size: 14px;
+              color: #ea5414;
+            }
+            .hornIcon {
+              position: absolute;
+              left: 0;
+              bottom: 0;
+              background: #1bbc9b;
+              box-shadow: 0 2px 2px 0 rgba(5, 147, 113, 0.1);
+              border-radius: 0 0 0 4px;
+              width: 33px;
+              height: 32px;
+              font-size: 12px;
+              color: #ffffff;
+              line-height: 37px;
+              width: 0;
+              height: 0;
+              border-bottom: 25px solid #1bbc9b;
+              border-right: 26px solid;
+            }
+          }
+
+        }
+        .el-pagination {
+          margin: 5px;
+          padding: 0;
+          position: absolute;
+          right: 17px;
+          bottom: 10px;
+          button {
+            background: #fff;
+            width: 104px;
+            height: 58px;
+            box-shadow: 0 2px 2px 0 rgba(5, 147, 113, 0.1);
+            border-radius: 4px;
+            .el-icon {
+              font-size: 22px;
+              color: #1bbc9b;
+              font-weight: bold;
+            }
+          }
+          .btn-prev {
+            margin-right: 10px;
+          }
+        }
+        .noneBg {
+          background: #C6E9E3;
+          color: #fff;
+          p:first-child {
+            color: #fff;
+          }
+          p:nth-child(2) {
+            color: #fff;
+            margin-left: 35px;
+          }
+        }
+      }
+      .userSyn {
+        background: #254a42;
+        height: 164px;
+        .sysNavTep {
+          display: flex;
+          flex-wrap: wrap;
+          padding: 20px 22px 0 22px;
+          margin: 0;
+          .el-col {
+            cursor: pointer;
+            .partstyle {
+              background:#1bbc9b ;
+              background-image:inherit;
+              box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.1);
+              border-radius: 4px;
+              height: 52px;
+              margin-bottom: 20px;
+              display: flex;
+              align-items: center;
+              flex-direction: column;
+              justify-content: center;
+              padding: 0;
+              span {
+                font-family: MicrosoftYaHei;
+                font-size: 12px;
+                color: #ffffff;
+              }
+            }
+            .same {
+              background-image: linear-gradient(
+                  -180deg,
+                  #3adfcb 0%,
+                  #1bbc9b 100%
+              );
+
+              box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.1);
+              border-radius: 4px;
+              height: 52px;
+              margin-bottom: 20px;
+              display: flex;
+              align-items: center;
+              flex-direction: column;
+              justify-content: center;
+              padding: 0;
+              span {
+                font-family: MicrosoftYaHei;
+                font-size: 12px;
+                color: #ffffff;
+              }
+            }
+            a {
+              text-decoration: none;
+            }
+            .sameColor {
+
+              background-image: linear-gradient(
+                  -180deg,
+                  #ff8f5f 0%,
+                  #ea5414 100%
+              );
+
+              box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.1);
+              border-radius: 4px;
+              height: 52px;
+              margin-bottom: 20px;
+              display: flex;
+              align-items: center;
+              flex-direction: column;
+              justify-content: center;
+              padding: 0;
+              span {
+                font-family: MicrosoftYaHei;
+                font-size: 12px;
+                color: #ffffff;
+              }
+            }
+            .sameColortwo {
+              background:#ea5414 ;
+
+
+              box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.1);
+              border-radius: 4px;
+              height: 52px;
+              margin-bottom: 20px;
+              display: flex;
+              align-items: center;
+              flex-direction: column;
+              justify-content: center;
+              padding: 0;
+              span {
+                font-family: MicrosoftYaHei;
+                font-size: 12px;
+                color: #ffffff;
+              }
+            }
+          }
+        }
+      }
+    }
+    //MINI计算器样式重构
+    .calculator {
+      width: 303px;
+      height: 230px;
+      .textDomain {
+        height: 34px;
+        input {
+          width: 227px;
+          height: 34px;
+        }
+      }
+    }
+    .numberTop button {
+      width: 75px !important;
+      height: 48px !important;
+    }
+    //选中项
+    .checkedItem {
+      background: #1bbc9b;
+      width: 300px;
+      min-height: 48px;
+    }
+    .opfList{
+      padding-left:0!important;
+
+    }
+  }
+  .orderSystem .sysBill .billDetailList li .opfList{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+     background: white;
+  }
+  .orderSystem .sysBill .billDetailList li .opfListItem{
+    display: flex;
+    span{
+    //  width: 45px;
+      padding-left:0;
+      margin-left: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    span:nth-child(3){
+      max-width: 70px;
+      min-width: 70px;
+      word-break:normal; width:auto; display:block; white-space:pre-wrap;word-wrap : break-word ;overflow: hidden ;
+    }
+    background: whitesmoke;
+    padding-left:0;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  .orderSystem .sysBill .billDetailList li{
+    padding-bottom: 0;
+    .padingten{
+      padding-bottom: 10px;
+    }
+  }
+</style>

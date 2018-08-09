@@ -1,0 +1,13 @@
+<div class="refuse_box_main refuse_box_main_new">
+	<p class="show intype positionR"><span class="addres_detail_lable positionA">收货地址:</span><span class="addres_detail"><%=address%></span></p>
+	
+	<div class="clearfix" style="margin-bottom: 30px;">
+		<p class="refuse_reason fleft">配送方式:</p>
+		<div class="throug checkAction">
+			<label class="sendTypeLal" value="2"><span id="selfSend" class="check_choose"></span><span>自配送</span></label>
+		</div>
+		<div class="cant_throug checkAction">
+			<label class="sendTypeLal" value="1"><span id="ddSend" class="check_choose"></span><span>达达配送</span></label>
+		</div>
+	</div>
+</div>

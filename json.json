@@ -1,0 +1,44 @@
+{
+  "opList": [
+    {
+      "productId": "TC001",
+      "productName": "套餐001",
+      "lessMoney": "10",
+      "num": "1",
+      "guiGe": "一份 ",
+      "shifuTotal": "10",
+      "dishStatus": 0,
+      "oneMoney": "10",
+      "discountRate": 100,
+      "isState": 0,
+      "opfList": [
+        {
+          "productId": "001"
+        },
+        {
+          "productId": "002"
+        }
+      ]
+    },
+    {
+      "productId": "TC001",
+      "productName": "套餐002",
+      "lessMoney": "10",
+      "num": "1",
+      "guiGe": "一份 ",
+      "shifuTotal": "10",
+      "dishStatus": 0,
+      "oneMoney": "10",
+      "discountRate": 100,
+      "isState": 0,
+      "opfList": [
+        {
+          "productId": "003"
+        },
+        {
+          "productId": "004"
+        }
+      ]
+    }
+  ]
+}

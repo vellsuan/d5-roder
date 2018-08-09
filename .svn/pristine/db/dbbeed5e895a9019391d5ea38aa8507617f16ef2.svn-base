@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>Document</title>
+	<link rel="stylesheet" type="text/css" href="com.css">
+	<link rel="stylesheet" type="text/css" href="cashier.css">
+</head>
+<body>
+	<div class="clearfix orderDetailTab">
+		<table>
+			<thead>
+				<tr>
+					<th width="20%">国际码</th>
+					<th width="20%">名称</th>
+					<th width="12%">单价</th>
+					<th width="12%">数量</th>
+					<th width="12%">折扣</th>
+					<th width="12%">金额</th>
+					<th width="12%">优惠</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>1111111</td>
+					<td>S股说的</td>
+					<td>111</td>
+					<td>1</td>
+					<td>12</td>
+					<td>122</td>
+					<td>12</td>
+				</tr>
+				<tr>
+					<td>1111111</td>
+					<td>S股说的</td>
+					<td>111</td>
+					<td>1</td>
+					<td>12</td>
+					<td>122</td>
+					<td>12</td>
+				</tr>
+				<tr>
+					<td>1111111</td>
+					<td>S股说的</td>
+					<td>111</td>
+					<td class="num">
+						<div class="product_calculate">
+							<div class="product_del proshow"><span style="cursor: pointer;"></span></div>
+							<div class="product_num" style="border: 1px solid rgb(204, 204, 204);"><input class="modifyNumIpt" title="商品数量" check="required num" style="width:45px;text-align:center" type="text" data-old-value="1" value="1"></div>
+							<div class="product_add proshow"><span style="cursor: pointer;"></span></div>
+						</div>
+					</td>
+					<td>12</td>
+					<td>122</td>
+					<td>12</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+
+	<!-- 弹出框 -->
+	<div class="orderTipbox">
+		<div class="headline">订单查询</div>
+		<div class="tipboxCon clearfix">
+			<div class="inputDiv">
+				 <span class="fleft">订单号：</span>
+				 <input type="text" class="fleft"/>
+			</div>
+		</div>
+		<div class="tipboxBtn">
+			<input type="button" value="查询" class="sure fleft"/>
+			<input type="button" value="取消" class="cancel fright"/>
+		</div>
+	</div>
+</body>
+</html>

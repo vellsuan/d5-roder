@@ -1,0 +1,20 @@
+
+http://117.78.40.253:8981/workspace/myWorkspace.do?projectId=19# 接口
+http://zentao.jingying8.com/zentaopms/www/bug-browse-25-0-assigntome-0.html 地址
+http://zentao.jingying8.com/zentaopms/www/user-login-L3plbnRhb3Btcy93d3cvbXktYnVnLmh0bWw=.html 禅道 zhenglikun321
+ 1.菜品未显示   2.应收金额未计算
+   orderSn 非動態 是因爲之前號都沒數據 讓寫死來測
+ 2菜品數量
+   pagecounts 由原来23 改为28
+ 3 修复下单后下单按钮没弹起导致的第二次下单要按两次
+ 4，店员打折弹窗不出现，和打折完以后关闭的状态。
+ 5，需要改的bug账号切换后本地数据清除
+ 6，应付金额当打折额度因为小数超过以后这行导致看不到金额
+ 7，大部分弹窗问题事数据状态，应该在刷新以后重置一下所有的弹窗状态 restmenu
+ 8,input 的大坑 不适用 v-on:input="change"  不能用 用target也无效直接@change也无效
+ 9，el-input 大坑 change只根据value改变而调用，而不是根据v-model的 导致选择了watch还要观察一次
+ 10，每个任务执行完毕要有回掉改变当前状态，因为之前没有定义导致出现很多问题。每次执行完某操作一定要改变当前菜品的状态利用回掉。
+ 11,单价x数量x折扣率    转整数*100， 转成整数，floor取整以后再转为二位小数/100 forund找精准数
+
+
+

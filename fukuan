@@ -1,0 +1,6 @@
+this.outputVal=Number(this.outputVal).toFixed(1)
+弄一个webstorm计算器插件
+
+better-scroll
+https://zhuanlan.zhihu.com/p/27407024
+computed

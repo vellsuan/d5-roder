@@ -1,0 +1,5 @@
+<p class="odd-numbers">原始订单金额： <em><%=Util.formatCurrency(Number(orderObj.orgPrice)+Number(orderObj.confirmCode))%></em></p>
+<p class="odd-numbers">优惠金额: <em><%=Util.formatCurrency(Number(disPrice)+Number(orderObj.confirmCode))%></em></p>
+<p class="odd-numbers">运费: <em><%=Util.formatCurrency(orderObj.sendPrice)%></em></p>
+<p class="odd-numbers">实付金额: <em><%=Util.formatCurrency(orderObj.allprice)%></em></p>
+<p class="odd-numbers">差异金额: <em><%=Util.formatCurrency(orderObj.changePrice)%></em></p>

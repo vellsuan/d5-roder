@@ -1,0 +1,499 @@
+<template>
+    <el-dialog title="转台" :visible.sync="dialogVisible" width="642px" top="calc((100vh - 664px)/2)" class="shiftTable" :before-close="handleClose" center>
+    <div class="dialog-body-left">
+        <div class="rollOut">
+            <div>
+                <el-button v-for="(rollout,index) in resRollOut" :key="rollout.id" @click="cleanRollOut">{{rollout.number}}</el-button>
+            </div>
+            <el-button @click="rollOut(0)">选择转出台位</el-button>
+        </div>
+        <div class="switchTo">
+            <div>
+                <el-button v-for="(rollIn,index) in resRollIn" :key="rollIn.id" @click="cleanRollIn">{{rollIn.number}}</el-button>
+            </div>
+            <el-button @click="rollIn(1)">选择转入台位</el-button>
+        </div>
+    </div>
+    <div class="dialog-body-right">
+            <div class="seatList" v-for="(item,index) in res" :key="item.id" >
+                <el-button class="tableNumber" v-model="status" @click="turnTable(index,item.status)" :class="item.classBtn">{{item.number}}</el-button>
+            </div>    
+            <div class="turn-page" v-show="show">
+                <el-button class="tableNumber" @click="pageUp">
+                    <span class="left-arrow"></span>
+                </el-button>
+                <el-button class="tableNumber" @click="pageDown">
+                    <span class="right-arrow"></span>
+                </el-button>
+            </div>    
+    </div>
+    <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="confirmTurnTable">确认</el-button>
+        <el-button @click="cancel">取消</el-button>
+    </span>
+    </el-dialog>
+</template>
+
+<script>
+import { mapState,mapMutations } from 'vuex';
+  export default {
+    data() {
+      return {
+        show:false,
+        dialogVisible: false,
+        res:{},
+        resRollOut:[],
+        resRollIn:[],
+        pageCount:22,
+        currentPageNum: 1,
+        status:''
+      };
+    },
+    mounted ()  {
+    },
+    methods: {
+        rollOut(identity){
+            this.status = 1;
+            this.show = true;
+            if(identity == 0){
+                this.currentPageNum = 1;
+                const params = {
+                    url: 'TB000001',
+                    data: {
+                        currentPageNum:this.currentPageNum,
+                        pageCount:this.pageCount,
+                        isDelete: '0',
+                        shopSn : this.userInfo.shop.shopSn,
+                        //shopSn : "B007007",
+                        status : this.status
+                    }
+                }
+                this.api.post(params, res=> {
+                    this.res = res && res.page.datas;
+                    if(this.res){
+                        for(let i = 0;i<this.res.length;i++){
+                            if(this.res[i].status==1){
+                                this.res[i].classBtn='tableNumber1';
+                            }
+                        }
+                    }
+                },msg=>{
+                    this.currentPageNum = this.currentPageNum -1;
+                    if(this.currentPageNum < 1){
+                        this.currentPageNum = 1;
+                    }
+                    this.$alert('已经没有更多了!', '提示',{
+                        closeOnClickModal:true,
+                        center: true,
+                    });
+                    return false;
+                });
+            }else{
+                const params = {
+                    url: 'TB000001',
+                    data: {
+                        currentPageNum:this.currentPageNum,
+                        pageCount:this.pageCount,
+                        isDelete: '0',
+                        shopSn : this.userInfo.shop.shopSn,
+                        //shopSn : "B007007",
+                        status : this.status
+                    }
+                }
+                this.api.post(params, res=> {
+                    this.res = res && res.page.datas;
+                    if(this.res){
+                        for(let i = 0;i<this.res.length;i++){
+                            if(this.res[i].status==1){
+                                this.res[i].classBtn='tableNumber1';
+                            }
+                        }
+                    }
+                },msg=>{
+                    this.currentPageNum = this.currentPageNum -1;
+                    if(this.currentPageNum < 1){
+                        this.currentPageNum = 1;
+                    }
+                    this.$alert('已经没有更多了!', '提示',{
+                        closeOnClickModal:true,
+                        center: true,
+                    });
+                    return false;
+                });
+            }
+        },
+        rollIn(identity){
+            if(this.resRollOut.length > 0){
+                this.status = 0;
+                this.show = true;
+                if(identity == 1){
+                    this.currentPageNum = 1;
+                    const params = {
+                        url: 'TB000001',
+                        data: {
+                            currentPageNum:this.currentPageNum,
+                            pageCount:this.pageCount,
+                            isDelete: '0',
+                            shopSn : this.userInfo.shop.shopSn,
+                            //shopSn : "B007007",
+                            status : this.status
+                        }
+                    }
+                    this.api.post(params, res=> {
+                        this.res = res && res.page.datas;
+                    },msg=>{
+                        this.currentPageNum = this.currentPageNum -1;
+                        if(this.currentPageNum < 1){
+                            this.currentPageNum = 1;
+                        }
+                        this.$alert('已经没有更多了!', '提示',{
+                            closeOnClickModal:true,
+                            center: true,
+                        });
+                        return false;
+                    });
+                }else{
+                    const params = {
+                        url: 'TB000001',
+                        data: {
+                            currentPageNum:this.currentPageNum,
+                            pageCount:this.pageCount,
+                            isDelete: '0',
+                            shopSn : this.userInfo.shop.shopSn,
+                            //shopSn : "B007007",
+                            status : this.status
+                        }
+                    }
+                    this.api.post(params, res=> {
+                        this.res = res && res.page.datas;
+                    },msg=>{
+                        this.currentPageNum = this.currentPageNum -1;
+                        if(this.currentPageNum < 1){
+                            this.currentPageNum = 1;
+                        }
+                        this.$alert('已经没有更多了!', '提示',{
+                            closeOnClickModal:true,
+                            center: true,
+                        });
+                        return false;
+                    });
+                }    
+            }else{
+                this.$alert('请先选择转出台位!', '提示',{
+                  closeOnClickModal:true,
+                  center: true,
+                });
+                return false;
+            } 
+        },
+        pageUp(){
+            this.currentPageNum = this.currentPageNum - 1;
+            if(this.currentPageNum < 1){
+                this.currentPageNum = 1;
+            }
+            if(this.status == 1){
+                this.rollOut();
+            }else if(this.status == 0){
+                this.rollIn();
+            }else{
+                return false;
+            }
+            
+        },
+        pageDown(){
+            this.currentPageNum = this.currentPageNum + 1;
+            if(this.status == 1){
+                this.rollOut();
+            }else if(this.status == 0){
+                this.rollIn();
+            }else{
+                return false;
+            }
+        },
+        turnTable(index,status){
+            if(status == 1){
+                if(this.resRollOut.length<1){
+                    this.resRollOut.push(this.res[index]);
+                }else{
+                    this.resRollOut.splice(0,1,this.res[index]);
+                }
+            }else if(status == 0 && !this.resRollOut.length){
+                this.$alert('请先选择转出台位!', '提示',{
+                    closeOnClickModal:true,
+                    center: true,
+                });
+            }else{
+                if(this.resRollIn.length<1){
+                    this.resRollIn.push(this.res[index]);
+                }else{
+                    this.resRollIn.splice(0,1,this.res[index]);
+                }
+            }
+        },
+        confirmTurnTable(){
+            if(this.resRollOut.length > 0 && this.resRollIn.length > 0){
+                const params = {
+                    url: 'TB000006',
+                    data: {
+                        fromId:this.resRollOut[0].id,
+                        toId: this.resRollIn[0].id
+                    }
+                }
+                this.api.post(params, res=> {
+                    if(res){
+                        this.dialogVisible = false;
+                        this.currentPageNum = 1;
+                        this.resRollOut = [];
+                        this.resRollIn = [];
+                        this.rollOut();
+                        this.$emit("shiftTable");
+                        this.$alert('转台成功!', '提示',{
+                            closeOnClickModal:true,
+                            center: true,
+                        });
+                    }
+                },msg=>{
+                    this.currentPageNum = this.currentPageNum -1;
+                    if(this.currentPageNum < 1){
+                        this.currentPageNum = 1;
+                    }
+                    this.$alert(msg, '提示',{
+                    closeOnClickModal:true,
+                    center: true,
+                    });
+                return false;
+                });
+            }else{
+                this.$alert('请查看桌位是否选择完成!', '提示',{
+                    closeOnClickModal:true,
+                    center: true,
+                });
+                return false;
+            }    
+        },
+        cleanRollOut(){
+            if(this.resRollIn.length < 1){
+                this.resRollOut.splice(0,1);
+            }else{
+                this.$alert('请先操作转入台位!', '提示',{
+                    closeOnClickModal:true,
+                    center: true,
+                });
+                return false;
+            }
+        },
+        cleanRollIn(){
+            this.resRollIn.splice(0,1);
+        },
+        cancel(){
+            // this.dialogVisible = false;
+            // this.resRollOut=[];
+            // this.resRollIn=[];
+            // this.rollOut();
+            Object.assign(this.$data, this.$options.data())
+        },
+        handleClose(){
+            // this.dialogVisible = false;
+            // this.resRollOut=[];
+            // this.resRollIn=[];
+            // this.rollOut();
+            Object.assign(this.$data, this.$options.data())
+        }
+    },
+    computed: {
+        ...mapState([
+            'userInfo'
+        ]),
+    },
+  };
+</script>
+
+<style lang="scss">
+  .shiftTable{  
+    .el-dialog{
+        height: 664px;
+        .el-dialog__header{
+            padding-top: 20px;
+            padding-bottom: 30px;
+            .el-dialog__close{
+                display: none;
+            }
+        }
+        .el-dialog__body{
+            margin-bottom: 20px;
+            padding: 0 20px;
+            height: 487px;
+            display: flex;
+            .dialog-body-left{
+                margin-right: 20px;
+                width: 250px;
+                .rollOut{
+                    width: 100%;
+                    height: 248px;
+                    div{
+                        background:#efefef;
+                        border-radius:4px;
+                        width:250px;
+                        height:176px;
+                        padding: 10px;
+                        display: flex;
+                        flex-flow:row wrap;
+                        align-content:flex-start;
+                        .el-button{
+                            margin: 10px;
+                            background-image:linear-gradient(-180deg, #3adfcb 0%, #1bbc9b 100%);
+                            box-shadow:0 2px 4px 0 rgba(0,0,0,0.50);
+                            width:56px;
+                            height:56px;
+                        }
+                        .el-button:hover{
+                            background-image:linear-gradient(-180deg, #3adfcb 0%, #1bbc9b 100%);
+                            box-shadow:0 2px 4px 0 rgba(0,0,0,0.50);
+                        }
+                    }
+                    .el-button{
+                        border: 0;
+                        margin-top: 5px;
+                        background-image:linear-gradient(-180deg, #3adfcb 0%, #1bbc9b 100%);
+                        box-shadow:0 4px 8px 0 rgba(0,0,0,0.50);
+                        border-radius:4px;
+                        width:250px;
+                        height:58px;
+                        span{
+                            font-size:16px;
+                            color:#ffffff;
+                            line-height:16px;
+                            text-align:center;
+                        }
+                    }
+                    .el-button:hover{
+                        background:#009176;
+                        box-shadow:0 0 0 0 rgba(0,0,0,0);
+                    }
+                }
+                .switchTo{
+                    width: 100%;
+                    div{
+                        background:#efefef;
+                        border-radius:4px;
+                        width:250px;
+                        height:176px;
+                        padding: 10px;
+                        display: flex;
+                        flex-flow:row wrap;
+                        align-content:flex-start;
+                        .el-button{
+                            margin: 10px;
+                            background:#525252;
+                            box-shadow:0 2px 4px 0 rgba(0,0,0,0.50);
+                            width:56px;
+                            height:56px;
+                        }
+                        .el-button:hover{
+                            background:#525252;
+                            box-shadow:0 2px 4px 0 rgba(0,0,0,0.50);
+                        }
+                    }
+                    .el-button{
+                        border: 0;
+                        margin-top: 5px;
+                        background-image:linear-gradient(-180deg, #3adfcb 0%, #1bbc9b 100%);
+                        box-shadow:0 4px 8px 0 rgba(0,0,0,0.50);
+                        border-radius:4px;
+                        width:250px;
+                        height:58px;
+                        span{
+                            font-size:16px;
+                            color:#ffffff;
+                            line-height:16px;
+                            text-align:center;
+                        }
+                    }
+                    .el-button:hover{
+                        background:#009176;
+                        box-shadow:0 0 0 0 rgba(0,0,0,0);
+                    }
+                }
+            }
+            .dialog-body-right{
+                background:#efefef;
+                border-radius:4px;
+                width:332px;
+                height:488px;
+                padding: 10px;
+                display: flex;
+                flex-flow:wrap;
+                align-content:flex-start;
+                position: relative;
+                .tableNumber{
+                    border: 0;
+                    margin: 10px;
+                    border-radius: 0;
+                    background:#525252;
+                    box-shadow:0 2px 4px 0 rgba(0,0,0,0.50);
+                    width:58px;
+                    height:58px;
+                    span{
+                        display: block;
+                        font-size:20px;
+                        color:#ffffff;
+                        line-height:20px;
+                        text-align:center; 
+                        .left-arrow{
+                            display: block;
+                            width: 12px;
+                            height: 21px;
+                            background:url(../../../assets/images/left-arrow.png) center no-repeat;
+                        }
+                        .right-arrow{
+                            display: block;
+                            width: 20px;
+                            height: 21px;
+                            background:url(../../../assets/images/right-arrow.png) center no-repeat;
+                        }
+                    }
+                }
+                .tableNumber1{
+                    background-image:linear-gradient(-180deg, #3adfcb 0%, #1bbc9b 100%);
+                    box-shadow:0 2px 4px 0 rgba(0,0,0,0.50);
+                }
+                .turn-page{
+                    position: absolute;
+                    right: 10px;
+                    bottom: 10px;
+                    button:last-child{
+                        margin-left: 6px;
+                    }
+                }
+            }
+        }
+        .el-dialog__footer{
+            height: 78px;
+            padding: 0;
+            .el-button--primary{
+                border: 0;
+                margin-right: 20px;
+                background-image:linear-gradient(-180deg, #3adfcb 0%, #1bbc9b 100%);
+                border-radius:4px;
+                width:160px;
+                height:58px;
+                font-size:20px;
+                color:#ffffff;
+                line-height:20px;
+                text-align:center;
+            }
+            .el-button--default{
+                border: 0;
+                background:#dee0e7;
+                border-radius:4px;
+                width:160px;
+                height:58px;
+                font-size:20px;
+                color:#989898;
+                line-height:20px;
+                text-align:center;
+            }
+        }
+    }
+  }  
+</style>

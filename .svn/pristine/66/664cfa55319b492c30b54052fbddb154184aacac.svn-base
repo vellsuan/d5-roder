@@ -1,0 +1,210 @@
+body {
+	background-color: #e0e3e8;
+	height: 100%;position: relative;
+	overflow: hidden;
+	top:0 ;
+	left: 0;
+}
+
+.wrapper {
+	width: 485px!important;
+    height: 287px!important;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -242px;
+    margin-top: -136px;
+    overflow: hidden;
+    min-width: 0;
+    min-height: 0;
+}
+
+.header {
+	margin: 0 auto;
+	width: 485px;
+	height: 76px;
+}
+
+.header .logo-left {
+	float: left;
+	width: 190px;
+	height: 76px;
+	border-right: solid 1px #c9c9c9;
+}
+.header .logo-left img{
+	width: 76px;
+    height: 76px;
+    margin: 0 auto;
+}
+.header .logo-right {
+	float: right;
+	width: 280px;
+	height: 68px;
+    padding-top: 8px;
+}
+
+.header .logo-right .general {
+	font-size: 24px;
+	margin: 0 0 5px 0;
+	Trident
+}
+
+.header .logo-right .lattice {
+	color: #959595;
+	font-size: 13px;
+}
+
+.login-begin {
+	margin-top: 21px;
+	width: 491px;
+	height: 190px;
+	background: url("../images/bacpic.png") no-repeat;
+}
+
+.login-begin table .tr-first {
+	display: block;
+	width: 491px;
+	height: 98px;
+	margin: 48px 0 23px 37px;
+}
+
+.login-begin table .tr-first td span {
+	display: inline-block;
+	height: 15px;
+	width: 16px;
+	background: url("../images/person.png") no-repeat;
+	background-size: 16px 15px;
+	margin: 0 11px 0 5px;
+}
+
+.login-begin table .tr-password {
+	display: block;
+	width: 491px;
+	height: 92px;
+	margin: 0 0 0 37px;
+	position: relative;
+	top: -76px;
+}
+
+.login-begin table tr td {
+	color: #ffffff;
+	font-size: 16px;
+}
+
+.login-begin table tr td input {
+	border: none;
+	width: 200px;
+	height: 44px;
+	line-height: 44px;
+	background-color: rgba(37, 145, 245, 0);
+	color: #ffffff;
+/*	margin-left: 13px;*/
+	font-size: 16px;
+}
+
+.login-begin table .tr-password td span {
+	display: inline-block;
+	height: 19px;
+	width: 17px;
+	background: url("../images/pass.png") no-repeat;
+	background-size: 17px 19px;
+	margin: 0 11px 0 5px;
+}
+
+.loin-btn {
+	display: block;
+	height: 81px;
+	width: 78px;
+	border-radius: 3.5rem;
+	position: relative;
+	right: 0;
+	top: -111%;
+	left: 83%;
+}
+
+.loin-btn input {
+	background: yellow;
+	color: #ffffff;
+	font-size: 19px;
+	background-color: rgba(0, 191, 255, 0);
+	cursor: pointer;
+	line-height: 60px;
+	height: 81px;
+	width: 78px;
+}
+
+.showComDialog {
+	background: rgba(0, 0, 0, 0.50);
+	filter: alpha(opacity=90);
+	opacity: 1;
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 200;
+	min-width: 100%;
+}
+.scanning {
+	width: 486px;
+    height: 308px;
+    background: url(../images/bigpick.png) no-repeat center center;
+    background-size: 100%;
+    margin: 0 auto;
+    margin-top: 188px;
+    position: relative;
+}
+.scanning h5 {
+	height: 56px;
+    line-height: 56px;
+    font-size: 16px;
+    font-weight: normal;
+    padding-left: 20px;
+}
+.scanning h5 span {
+	display: inline-block;
+	float: right;
+	width: 26px;
+	height: 22px;
+	background: url("../images/wrongg.png") no-repeat;
+	padding-right: 40px;
+	margin-top: 17px;
+}
+.merchandise img {
+	text-align: center;
+	margin: 0 auto;
+	margin-top: 39px;
+}
+.merchandise p {
+	margin: 0 auto;
+	text-align: center;
+	margin-top: 17px;
+	font-size: 16px;
+}
+.end-confirms {
+	width: 80px;
+	height: 80px;
+	position: absolute;
+	text-align: center;
+	right: 0;
+	bottom: 0;
+	line-height: 80px;
+}
+.end-confirms input {
+	display: inline-block;
+	font-size: 16px;
+	background-color: #389fff;
+	color: white;
+}
+.comDialogClose1, .comDialogClose2{
+	cursor: pointer;
+}
+
+.user_choose{
+	position: absolute;
+}
+
+.tr-first>td{
+	position: relative;
+}

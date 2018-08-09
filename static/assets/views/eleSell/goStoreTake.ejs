@@ -1,0 +1,74 @@
+						<div class="rebounds">
+						<div class="sprang-left">
+							<p class="odd-numbers"><em><span class="orderSN"><%=orderObj.orderSn%></span></em></p>
+							<p class="odd-numbers"><em><%=Util.formatTime(orderObj.addTime,1)%></em></p>
+						</div>
+						<div class="sprang-right">
+							<input type="button" orderSN='<%=orderObj.orderSn%>' data-reader='0' value="弹开" class="sprig-input" />
+							<div class="info">
+								<div class="bounce-con">
+									<p class="odd-numbers"><span>收货人:</span> <em><%=orderObj.acceptName%></em></p>
+									<p class="odd-numbers"><span style="text-align: center;">电话:</span> <em class="telWidth"><%=orderObj.tel%></em></p>
+									<p class="odd-numbers"><span>收货时间:</span><em><%=Util.formatTime(orderObj.hopeTimestamp,1)%></em></p>
+									<p class="odd-numbers"><span>收货备注:</span><em><%=Util.limitCharacter(orderObj.postscript,100)%></em></p>
+								</div>
+								<div class="clearfix"></div>
+								<div class="bounce-con2" style="border-bottom: none;">
+									<p class="odd-numbers">收货地址: <em><%=orderObj.address%></em></p>
+								</div>
+								
+								<div class="big-form modify-form">
+										<div class="form-open modify-form-open OrderTable modes-open orderDetailTab">
+											<!--表格开始-->
+										</div>
+								</div>
+								
+								<div class="clearfix"></div>
+								<div class="original-con">
+									<div class="original-con-left fleft tableMoneyInfo original-con-left-goshop">
+									</div>
+								</div>
+								<!--按钮-->
+								<div class="conbtn">
+									<% if(orderObj.email && orderObj.email =="1"){ %>
+										<input type="button" value="已打印" class="print" />
+									<%}else{%>
+										<input type="button" value="未打印" class="print" />
+									<%}%>
+									<%if(orderObj.orderStatus=="0" || orderObj.orderStatus=="1" || orderObj.orderStatus=="11"){%>
+										<input id="completeOrder" data-orderStatu=<%=orderObj.orderStatus%> data-orderId=<%=orderObj.orderId%> type="button" value="提货" class="orders" />
+									<%}%>
+								</div>
+								<!--按钮结束-->
+								<!--再次修改-->
+								<div class="modifyagain">
+									<div class="bounce-conthr agin-modify">
+										<p>
+											<input type="text" placeholder="请输入商品条码" class="lading" />
+											<input type="button" value="确认" class="confirm" />
+											<span class="prompt">请输入或扫描添加商品</span>
+											<!--<input type="button" value="打开快捷菜单" class="open showOverlay" />-->
+										</p>
+									</div>
+									<div class="big-form modify-form">
+										<div class="zp-modify-open form-open modify-form-open modes-open orderDetailTab">
+										</div>
+									</div>
+									<div class="clearfix"></div>
+									<div class="original-con">
+										<div class="original-con-left fleft tableModifyInfo original-con-left-goshop">
+											
+										</div>
+
+									</div>
+									<!--按钮-->
+									<div class="conbtn">
+										<input type="button" value="确定修改" class="modification" orderId="<%=orderObj.orderId%>"  orderSN="<%=orderObj.orderSn%>" />
+										<input type="button" value="取消" class="cancel" />
+									</div>
+									<!--按钮结束-->
+								</div>
+								<!--再次修改结束-->
+							</div>
+						</div>
+					</div>

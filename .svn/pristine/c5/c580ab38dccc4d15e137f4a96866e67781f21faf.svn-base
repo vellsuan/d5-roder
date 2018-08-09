@@ -1,0 +1,329 @@
+<template>
+    <el-dialog title="优惠券"
+    :visible.sync="dialogVisible"
+    :show-close="false"
+    :close-on-click-modal="false"
+    top="10vh"
+    center
+    class="memberentry">
+        <div class="search">
+            <input type="text" value=""  v-model="searchDish" autofocus="autofocus"/>
+            <button @click="searchCoupon">搜索</button>
+        </div>
+        <div class="couponDetail">
+             <ul>
+                 <li>
+                     <span>优惠规则</span>
+
+                   <div class="couponVal">{{date.yhqms}}</div>
+                 </li>
+                 <li>
+                     <span>有效日期</span>
+                     <div class="couponVal">{{date.sxsj | dateFormat}}至{{date.gqsj | dateFormat}}</div>
+                 </li>
+                 <li>
+                     <span>使用状态</span>
+                     <div class="couponVal">{{date.syzt | status}}</div>
+                 </li>
+                 <li>
+                     <span>使用时间</span>
+                     <div class="couponVal">{{date.sysj | dateFormat}}</div>
+                 </li>
+                 <li>
+                     <span>会员编码</span>
+                     <div class="couponVal">{{date.userId}}</div>
+                 </li>
+             </ul>
+        </div>
+        <span slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="useClick">使用</el-button>
+            <el-button @click='quxiao'>取消</el-button>
+        </span>
+    </el-dialog>
+
+
+</template>
+<script>
+export default {
+  data() {
+    return {
+      date:{},
+      branch:"",
+      orderId:"",
+      shopSn:"",
+      dialogVisible: false,
+      visible: false,
+      layout: "normal",
+      input: null,
+      searchDish: "",
+      couponId:"",
+      options: {
+        useKbEvents: false
+      }
+    };
+  },
+  props:['orderData','orderIdval'],
+  mounted() {
+
+  },
+  methods: {
+    quxiao(){
+      this.date = {}
+      this.couponId = ''
+      this.searchDish=''
+      this.dialogVisible = false
+    },
+    handleClose(done) {
+      this.$confirm("确认关闭？")
+        .then(_ => {
+          done();
+        })
+        .catch(_ => {});
+    },
+    searchCoupon(){
+         if(this.searchDish.trim()==''){
+           this.$message({
+             duration:1000,
+             showClose: true,
+             message: '请输入要搜索的内容',
+             type: 'error'
+           });
+         }else{
+           const params = {
+             url: 'CY200034',
+             data: {
+               yhm:this.searchDish.trim(),//"G90tjNeC"
+             }
+           }
+           this.api.post(params, res => {
+             console.log(res)
+             this.date = res.entity
+             this.couponId = res.entity.yhqid
+           },msg=>{
+             this.$message({
+               duration:1000,
+               showClose: true,
+               message: msg,
+               type: 'error'
+             });
+           })
+         }
+
+    },
+    useClick(){
+      if((this.searchDish.trim())!=''){
+        this.branch=this.$store.state.userInfo.shop.branch
+        this.shopSn=this.$store.state.userInfo.shop.shopSn
+      //POS00010.do取参数
+        const params = {
+            url: 'POS00011',
+            data: {
+            branch: this.branch,
+            couponCode:this.searchDish.trim(),
+            couponId:this.couponId,
+              orderId: this.orderIdval,
+              tableOrder:this.orderData.data.tableOrder,
+            shopSn:this.shopSn
+            }
+          }
+        if(this.couponId){
+
+          this.api.post(params, res => {
+            this.$emit('youhuiquan')
+            this.$message({
+              duration:1000,
+              showClose: true,
+              message: '优惠券录入成功',
+              type: 'success'
+            });
+          },
+          msg=>{
+            this.$message({
+              duration:1000,
+              showClose: true,
+              message: msg,
+              type: 'error'
+            });
+          })
+          this.dialogVisible=false
+        }else{
+          this.$message({
+            duration:1000,
+            showClose: true,
+            message: '请先搜索优惠券是否可用',
+            type: 'error'
+          });
+        }
+        this.date = {}
+        this.couponId = ''
+        this.searchDish=''
+      }else{
+        this.$message({
+             duration:1000,
+             showClose: true,
+             message: '请输入要使用的优惠券',
+             type: 'error'
+           });
+      }
+    }
+  },
+  filters: {
+    status(value){
+      switch (value) {
+        case "0":
+            return "未使用"
+          break;
+        case "1":
+            return "已使用"
+          break;
+        case "2":
+            return "失效"
+          break;
+        default:
+          return ""
+          break;
+      }
+    }
+  }
+};
+</script>
+<style lang="scss">
+.memberentry {
+  .softKeyboard {
+    position: absolute;
+    top: 654px;
+    right: auto;
+    left: -154px;
+    .vue-touch-keyboard {
+        width: 800px;
+
+        .keyboard .key {
+        height: 2rem;
+        line-height: 2rem;
+        }
+        .vue-touch-keyboard {
+        width: 100%;
+        height: 240px;
+        position: static;
+        }
+    }
+  }
+
+  .el-dialog {
+    background: #ffffff;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+    width: 500px;
+    padding: 30px 20px;
+    .el-dialog__header {
+      text-align: center;
+      height: 70px;
+      padding: 0;
+      .el-dialog__title {
+        line-height: 70px;
+        font-size: 20px;
+        color: #2d2d2d;
+        margin: 0;
+      }
+    }
+    .el-dialog__body {
+      padding: 0;
+      line-height: 0;
+      .search {
+        display: flex;
+        margin: 0 auto;
+        width: 400px;
+        height: 46px;
+        background: #efefef;
+        border: 1px solid #dee0e7;
+        border-radius: 4px;
+        input {
+          border: 0;
+          width: 304px;
+          padding-left: 20px;
+          outline: none;
+          background: #efefef;
+          font-size: 18px;
+          color: #2d2d2d;
+          letter-spacing: 0;
+          line-height: 18px;
+          text-align: left;
+        }
+        button {
+          outline: none;
+          background: #1bbc9b;
+          border: 0.1px solid #dee0e7;
+          border-radius: 4px;
+          width: 94px;
+          height: 44px;
+          font-size: 16px;
+          color: #ffffff;
+          line-height: 16px;
+          text-align: center;
+        }
+      }
+      .couponDetail {
+        padding: 20px 30px;
+        padding-bottom: 0;
+        ul {
+          li {
+            list-style-type: none;
+            display: flex;
+            margin-bottom: 20px;
+            span {
+              width: 62px;
+              display: block;
+              font-size: 14px;
+              color: #989898;
+              letter-spacing: 0;
+              line-height: 21px;
+              margin-right: 20px;
+            }
+            .couponVal {
+              font-size: 14px;
+              color: #2d2d2d;
+              letter-spacing: 0;
+              line-height: 21px;
+              text-align: left;
+              flex:1;
+            }
+          }
+        }
+      }
+    }
+    .el-dialog__footer {
+      padding: 10px;
+      .dialog-footer {
+        width: 100%;
+        .el-button--primary {
+          margin-right: 10px;
+          outline: none;
+          border: none;
+          background-image: linear-gradient(-180deg, #3adfcb 0%, #1bbc9b 100%);
+          border-radius: 4px;
+          width: 160px;
+          height: 58px;
+          font-size: 20px;
+          color: #ffffff;
+          letter-spacing: 0;
+          line-height: 20px;
+          text-align: center;
+        }
+        .el-button--default {
+          outline: none;
+          border: none;
+          background: #dee0e7;
+          border-radius: 4px;
+          width: 160px;
+          height: 58px;
+          font-size: 20px;
+          color: #989898;
+          letter-spacing: 0;
+          line-height: 20px;
+          text-align: center;
+        }
+      }
+    }
+  }
+}
+</style>

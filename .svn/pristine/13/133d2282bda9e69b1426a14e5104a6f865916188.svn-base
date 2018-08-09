@@ -1,0 +1,334 @@
+<template>
+    <el-dialog title="开台" :visible.sync="dialogVisible" width="500px" class="openTable" center>
+        <div class="tableContent">
+            <div>
+                <span>桌位</span>
+                <input type="text" v-model="tableNumber" disabled />
+            </div>
+            <div>
+                <span>人数</span>
+                <input type="text" v-model="number" value="" />
+            </div>
+            <div>
+                <span>服务员</span>
+                <div class="witerCode">
+                    <input type="text" v-model="realName" value=""  disabled="disabled"/>
+                    <el-button  @click="selectWaiter">选择</el-button>
+                </div>
+            </div>
+        </div>
+        <el-dialog title="选择服务员" :visible.sync="outerVisible" top="31vh" custom-class="changeWaiter" center append-to-body>
+            <div class="outListoKt">
+                <div v-for="(index,realItems) in realNameList" :key="realItems" @click="selectClick(realItems,index)" v-bind:class="{active:index==qwerqwre}">{{realNameList[realItems].realName}}</div>
+            </div>
+            <div slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="outerVisible = false">确定</el-button>
+                <!-- <el-button @click="outerVisible = false">取 消</el-button> -->
+            </div>
+        </el-dialog>
+        <span slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="confirmOriginal">确认</el-button>
+            <el-button @click="quxiao">取消</el-button>
+          <!--dialogVisible-->
+        </span>
+    </el-dialog>
+</template>
+
+<script>
+import { mapState,mapMutations } from 'vuex';
+  export default {
+    data() {
+      return {
+        dialogVisible: false,
+        outerVisible: false,
+        number:'',
+        tableOrder:'',
+        realNameList:{},
+        waiterId:"",
+        realName:"",
+        qwerqwre:"0"
+      };
+    },
+    props:['tableId','tableNumber','headcount'],
+    mounted () {
+        if(this.$store.state.userInfo.shopClerK){
+            if(this.$store.state.userInfo.shopClerK.clerkId){
+            this.waiterId = this.$store.state.userInfo.shopClerK.clerkId;
+            }
+            if(this.$store.state.userInfo.shopClerK.realName){
+                this.realName = this.$store.state.userInfo.shopClerK.realName;
+                this.realName = ''
+            }
+        }
+    },
+    methods: {
+      quxiao(){
+        this.dialogVisible = false;
+        this.number = '';
+        this.realName ='';
+      },
+        confirmOriginal(){
+        	this.number = this.number.replace(/\s+/g,"")
+        	console.log(this.number)
+            if(this.number){
+            	if(!isNaN(this.number) && this.number >0 ){
+	                if(this.headcount >= this.number){
+	                    let timestamp = Date.parse(new Date());
+	                    timestamp = timestamp / 1000;
+	                    this.tableOrder = this.tableNumber +"_"+ timestamp;
+	                    const params = {
+	                        url: 'TB000008',
+	                        data: {
+	                            id: this.tableId,
+	                            tableOrder: this.tableOrder,
+	                            usedNumber: this.number,
+	                            waiterId : this.waiterId,
+	                            waiterName :this.realName,
+	                            type:6
+	                        }
+	                    }
+	                    this.api.post(params, res=> {
+	                        if(res){
+	                            this.$alert('开台成功!', '提示',{
+	                                closeOnClickModal:true,
+	                                center: true,
+	                            });
+	                            this.$store.commit("savatableOrder", this.tableOrder);
+	                            this.$router.push({path: 'orderSystem',query:{tableOrder:this.tableOrder,id:this.tableId}});
+	                            //this.$router.push({path: 'orderSystem'});
+	                        }
+	                    },msg=>{
+	                        this.$alert('开台信息错误', '提示',{
+	                            closeOnClickModal:true,
+	                            center: true,
+	                        });
+	                        return false;
+	                    });
+	                }else{
+	                    this.$message.error('填写人数大于桌位数!');
+	                    return false;
+	                }
+	            }else{
+	            	this.$message.error('请输入正整数!');
+	                return false;
+	            }
+            }else{
+                this.$message.error('请填写人数!');
+                return false;
+            }
+        },
+        selectClick(realItems,index){
+            this.waiterId = this.realNameList[realItems].clerkId;
+            this.qwerqwre = index;
+            this.realName = this.realNameList[realItems].realName;
+        },
+        innerClick() {
+            this.innerVisible = false;
+
+        },
+        selectWaiter(){
+            let branch = this.$store.state.userInfo.shop.branch;
+            let shopId = this.$store.state.userInfo.shop.shopId;
+            const params = {
+                url: "PR100701",
+                data: {
+                branch: branch,
+                shopId: shopId,
+                isUse:1
+                }
+            };
+            this.api.post(params, res => {
+                this.realNameList = res.page.datas
+                this.$nextTick(()=>{
+                    this.outerVisible = true;
+                })
+            });
+        }
+    },
+    computed: {
+        ...mapState([
+            'userInfo'
+        ]),
+    },
+  };
+</script>
+
+<style lang="scss">
+  #app{
+      .openTable{
+        .el-dialog{
+            height:342px;
+            .el-dialog__header{
+                padding-top: 20px;
+                padding-bottom: 30px;
+                .el-dialog__close{
+                    display: none;
+                }
+            }
+            .el-dialog__body{
+                padding: 0;
+                width: 100%;
+                height: 162px;
+                padding-left: 55px;
+                .tableContent{
+                    display: flex;
+                    flex-direction:column;
+                    div{
+                        margin-bottom: 10px;
+                        display: flex;
+                        flex-flow:row wrap;
+                        align-content:flex-start;
+                        span{
+                            padding-top: 15px;
+                            text-align: right;
+                            width: 50px;
+                            margin-right: 20px;
+                            font-size:16px;
+                            color:#2d2d2d;
+                        }
+                        input{
+                            padding-left: 30px;
+                            outline: none;
+                            background:#efefef;
+                            border:1px solid #dee0e7;
+                            border-radius:4px;
+                            width:306px;
+                            height:46px;
+                            font-size:16px;
+                            color:#2d2d2d;
+                        }
+                        .witerCode{
+                            border:1px solid #dee0e7;
+                            border-radius:4px;
+                            width:306px;
+                            height:46px;
+                            display: flex;
+                            input{
+                                width:210px;
+                                padding-left: 30px;
+                                outline: none;
+                                border: 0;
+                                height:46px;
+                                font-size:16px;
+                                color:#2d2d2d;
+                            }
+                            .el-button{
+                                border: 0;
+                                background:#1bbc9b;
+                                border-radius:4px;
+                                width:94px;
+                                height:46px;
+                                span{
+                                    margin: 0;
+                                    font-size:16px;
+                                    color:#ffffff;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            .el-dialog__footer{
+                padding: 0;
+                margin-top: 30px;
+                .el-button--primary{
+                    border: 0;
+                    background-image:linear-gradient(-180deg, #3adfcb 0%, #1bbc9b 100%);
+                    border-radius:4px;
+                    width:160px;
+                    height:58px;
+                    font-size:20px;
+                    color:#ffffff;
+                    letter-spacing:0;
+                    line-height:20px;
+                    text-align:center;
+                    margin-right: 20px;
+                }
+                .el-button--default{
+                    border: 0;
+                    background:#dee0e7;
+                    border-radius:4px;
+                    width:160px;
+                    height:58px;
+                    font-size:20px;
+                    color:#989898;
+                    letter-spacing:0;
+                    line-height:20px;
+                    text-align:center;
+                }
+            }
+        }
+    }
+  }
+
+  .el-dialog__wrapper{
+      .changeWaiter{
+        width: 656px;
+        .el-dialog__header{
+            padding-top: 20px;
+            padding-bottom: 30px;
+            .el-dialog__close{
+                display: none;
+            }
+        }
+        .el-dialog__body {
+            padding: 0;
+            margin-bottom: 20px;
+            .outListoKt{
+                display: flex;
+                padding:0 30px;
+                flex-wrap: wrap;
+                height: 250px;
+                align-content: flex-start;
+                div{
+                    padding-top: 8px;
+                    cursor:pointer;
+                    margin: 16px;
+                    background:#ffffff;
+                    box-shadow:0 2px 4px 0 rgba(0,0,0,0.10);
+                    border-radius:4px;
+                   /* width:86px;*/
+                    height:40px;
+                    font-size:14px;
+                    color:#2d2d2d;
+                    letter-spacing:0;
+                    text-align:center;
+
+                }
+                .active{
+                    background:#1bbc9b;
+                    color: #ffffff;
+                }
+            }
+        }
+        .el-dialog__footer{
+            padding: 0;
+            padding-bottom: 20px;
+            .dialog-footer{
+                .el-button--primary{
+                    border: 0;
+                    background-image:linear-gradient(-180deg, #3adfcb 0%, #1bbc9b 100%);
+                    border-radius:4px;
+                    width:160px;
+                    height:58px;
+                    font-size:20px;
+                    color:#ffffff;
+                    text-align:center;
+                    margin-right: 20px;
+                }
+                .el-button--default{
+                    border: 0;
+                    background-image:linear-gradient(-180deg, #3adfcb 0%, #1bbc9b 100%);
+                    border-radius:4px;
+                    width:160px;
+                    height:58px;
+                    font-size:20px;
+                    color:#fff;
+                    letter-spacing:0;
+                    text-align:center;
+                }
+            }
+        }
+    }
+  }
+</style>
